@@ -1,7 +1,7 @@
 # 云译网
 来自“当然不是草台班子”的一个翻译系统
 
-# 原型
+## 原型
 首页：包含了在线翻译、数据记录等功能。其中输入的翻译文本会自动录入首页的AI对话记忆中，方便进行相关信息的检索。
-## 前台应用原型
-可以通过这个链接康康哦~：https://rp.mockplus.cn/team/invitation/-QFpg-R37/sinuvykiti/
+### 前台应用原型
+可以通过这个链接康康哦~：https://rp.mockplus.cn/run/kl8hNh9g6F/b503_uY-bs
