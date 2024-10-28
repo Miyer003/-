@@ -3,3 +3,5 @@
 
 # 原型
 首页：包含了在线翻译、数据记录等功能。其中输入的翻译文本会自动录入首页的AI对话记忆中，方便进行相关信息的检索。
+## 前台应用原型
+可以通过这个链接康康哦~：https://rp.mockplus.cn/team/invitation/-QFpg-R37/sinuvykiti/
