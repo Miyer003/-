@@ -1,0 +1,34 @@
+services:
+  mongodb:
+    container_name: mongodb
+    image: mongo:6.0.0 # 使用 MongoDB 官方的 6.0.0 版本
+    env_file:
+      - "./env/mongodb.env"
+    ports:
+      - "27017:27017"
+    networks:
+      - yunyiwang
+    volumes:
+      - ../config/mongo:/docker-entrypoint-initdb.d
+      - ./data/mongodb:/data/db
+
+  etcd:
+    container_name: etcd
+    image: quay.io/coreos/etcd:v3.5.5
+    restart: always
+    ports:
+      - 2379:2379
+      - 2380:2380
+    env_file:
+      - "./env/etcd.env"
+    volumes:
+      - ./script:/script
+      - ../config:/config
+    networks:
+      - yunyiwang
+    entrypoint: [ "sh", "-c", "chmod +x /script/etcd-monitor.sh && /script/etcd-monitor.sh & exec etcd" ]
+
+networks:
+  yunyiwang:
+    driver: bridge
+    name: yunyiwang
