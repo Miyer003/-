@@ -1,0 +1,24 @@
+server:
+  jwt-secret:
+  version: "1.0"
+  name: yunyiwang
+
+mongodb:
+  addr:
+
+
+
+services:
+  template:
+    name: template
+    load-balance: false
+    addr:
+      - 127.0.0.1:10001
+
+  api:
+    name: api
+    load-balance: false
+    addr:
+      - 0.0.0.0:20001
+
+
