@@ -97,13 +97,13 @@ $(SERVICES):
 	@if [ -z "$$TMUX" ]; then \
 		echo "$(PREFIX) you are not in tmux, press ENTER to start tmux environment."; \
 		read -r; \
-		if tmux has-session -t fzuhelp 2>/dev/null; then \
-			echo "$(PREFIX) Tmux session 'fzuhelp' already exists. Attaching to session and running command."; \
-			tmux attach-session -t fzuhelp; \
-			tmux send-keys -t fzuhelp "make $(service)" C-m; \
+		if tmux has-session -t yuyiwang 2>/dev/null; then \
+			echo "$(PREFIX) Tmux session 'yuyiwang' already exists. Attaching to session and running command."; \
+			tmux attach-session -t yuyiwang; \
+			tmux send-keys -t yuyiwang "make $(service)" C-m; \
 		else \
 			echo "$(PREFIX) No tmux session found. Creating a new session."; \
-			tmux new-session -s fzuhelp "make $(service); $$SHELL"; \
+			tmux new-session -s yuyiwang "make $(service); $$SHELL"; \
 		fi; \
 	else \
 		echo "$(PREFIX) Build $(service) target..."; \
@@ -113,18 +113,18 @@ $(SERVICES):
 	fi
 ifndef BUILD_ONLY
 	@echo "$(PREFIX) Automatic run server"
-	@if tmux list-windows -F '#{window_name}' | grep -q "^fzuhelper-$(service)$$"; then \
-		echo "$(PREFIX) Window 'fzuhelper-$(service)' already exists. Reusing the window."; \
-		tmux select-window -t "fzuhelper-$(service)"; \
+	@if tmux list-windows -F '#{window_name}' | grep -q "^yuyiwang-$(service)$$"; then \
+		echo "$(PREFIX) Window 'yuyiwang-$(service)' already exists. Reusing the window."; \
+		tmux select-window -t "yuyiwang-$(service)"; \
 	else \
-		echo "$(PREFIX) Window 'fzuhelper-$(service)' does not exist. Creating a new window."; \
-		tmux new-window -n "fzuhelper-$(service)"; \
+		echo "$(PREFIX) Window 'yuyiwang-$(service)' does not exist. Creating a new window."; \
+		tmux new-window -n "yuyiwang-$(service)"; \
 		tmux split-window -h ; \
-		tmux select-layout -t "fzuhelper-$(service)" even-horizontal; \
+		tmux select-layout -t "yuyiwang-$(service)" even-horizontal; \
 	fi
 	@echo "$(PREFIX) Running $(service) service in tmux..."
-	@tmux send-keys -t fzuhelper-$(service).0 'export SERVICE=$(service) && bash ./docker/script/entrypoint.sh' C-m
-	@tmux select-pane -t fzuhelper-$(service).1
+	@tmux send-keys -t yuyiwang-$(service).0 'export SERVICE=$(service) && bash ./docker/script/entrypoint.sh' C-m
+	@tmux select-pane -t yuyiwang-$(service).1
 endif
 
 # 推送到镜像服务中，需要提前 docker login，否则会推送失败

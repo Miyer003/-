@@ -62,9 +62,9 @@ start_container() {
     echo "port is $server_port"
     echo "start container $service_name"
     docker run -d --name $service_name \
-    --network fzu-helper \
+    --network yuyiwang \
     -p $server_port:$server_port \
-    -e ETCD_ADDR="fzu-helper-etcd:2379" \
+    -e ETCD_ADDR="yuyiwang-etcd:2379" \
     --restart always \
     $image
 }
