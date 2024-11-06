@@ -19,14 +19,7 @@ mkdir -p ${ROOT_DIR}/output/${RUN_NAME}
 
 # 基于环境变量决策是构建还是测试
 if [ "$IS_SYSTEM_TEST_ENV" != "1" ]; then
-    go build -o ${ROOT_DIR}/output/${RUN_NAME}/fzuhelper-${RUN_NAME}
+    go build -o ${ROOT_DIR}/output/${RUN_NAME}/yunyiwang-${RUN_NAME}
 else
-    go test -c -covermode=set -o ${ROOT_DIR}/output/${RUN_NAME}/fzuhelper-${RUN_NAME} -coverpkg=./...
+    go test -c -covermode=set -o ${ROOT_DIR}/output/${RUN_NAME}/yuyiwang-${RUN_NAME} -coverpkg=./...
 fi
-
-# 构造结果
-# output
-# └── {SERVICE}
-#     ├── bin
-#     │   └── fzuhelper-{SERVICE}
-#     └── entrypoint.sh
