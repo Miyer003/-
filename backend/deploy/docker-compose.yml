@@ -9,7 +9,7 @@ services:
     networks:
       - yunyiwang
     volumes:
-      - ../config/mongo:/docker-entrypoint-initdb.d
+      - ../config/mongo:/deploy-entrypoint-initdb.d
       - ./data/mongodb:/data/db
 
   etcd:
