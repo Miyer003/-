@@ -9,12 +9,6 @@ on:
         type: choice
         options:
           - api
-          - user
-          - classroom
-          - course
-          - launch_screen
-          - paper
-          - academic
 
 jobs:
   deploy:
@@ -33,7 +27,7 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          cd $GITHUB_WORKSPACE && bash ./hack/image-build-and-push.sh ${{ github.event.inputs.service }}
+          cd $GITHUB_WORKSPACE/backend && bash ./hack/image-build-and-push.sh ${{ github.event.inputs.service }}
 
       - name: SSH and deploy on server
         uses: appleboy/ssh-action@v1.1.0
