@@ -1,13 +1,11 @@
-FROM python:3.10-slim
+FROM python:3.10
 
 WORKDIR /app
 
-COPY . .
+COPY . /app
+# 安装 opencv 的依赖
+RUN apt-get update && apt-get install -y libgomp1 libgl1-mesa-glx
 
-# 安装项目依赖
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r ./deploy/requirements.txt
 
-EXPOSE 5000
-
-
-CMD ["python", "main.py"]
+CMD ["python3", "main.py"]
