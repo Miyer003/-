@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 
 client = OpenAI(
-    api_key="moonshot api key",#到时候替换成统一的api key
+    api_key="sk-7s63CxEEh75mtgaktYAJAAM86VMY3FfJbr146AQ3NZkTz6rl",#到时候替换成统一的api key
     base_url="https://api.moonshot.cn/v1",
 )
 
