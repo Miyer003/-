@@ -2,11 +2,19 @@ from flask import Flask, request, jsonify
 from openai import OpenAI
 import time
 
+from PIL import Image
+from paddleocr import PaddleOCR
+import numpy as np
+
+import PyPDF2
+from docx import Document
+from io import BytesIO
+
 app = Flask(__name__)
 
 
 client = OpenAI(
-    api_key="sk-7s63CxEEh75mtgaktYAJAAM86VMY3FfJbr146AQ3NZkTz6rl",#到时候替换成统一的api key
+    api_key="Moonshot api key",#统一替换成同一个api key
     base_url="https://api.moonshot.cn/v1",
 )
 
@@ -61,6 +69,136 @@ def translate_instant():
 
     # 调用Kimi API的代码获取翻译结果
     translation_result = call_kimi_api(source_text, target_language)
+
+    if translation_result != "无法连接大语言模型":
+        # 返回翻译结果给前端
+        return jsonify({
+            'base': {
+                'code': 200,  # 表示成功
+                'message': '翻译成功'
+            },
+            'translation': translation_result
+        })
+    else:
+        return jsonify({
+            'base': {
+                'code': 400,  # 表示失败
+                'message': '翻译失败'
+            },
+            'translation': translation_result
+        })
+
+
+@app.route('/translate/image', methods=['POST'])
+def translate_ocr():
+    # 检查文件是否为空
+    if 'image' not in request.files or 'user_id' not in request.form or 'target_language' not in request.form:
+        return jsonify({
+            'base': {
+                'code': 400,
+                'message': 'No file found or invalid input'
+            }
+        }), 400
+
+    # 获取请求数据
+    user_id = request.form.get('user_id')
+    target_language = request.form.get('target_language')
+    # 获取上传的文件
+    image_file = request.files.get('image')
+
+    # 将图片文件转换为PIL Image对象
+    try:
+        image = Image.open(image_file.stream)
+        image_array = np.array(image)
+    except IOError:
+        return jsonify({
+            'base': {
+                'code': 500,
+                'message': 'Unable to read image file'
+            }
+        }), 500
+
+    # 使用PaddleOCR识别图片中的文字
+    ocr = PaddleOCR(use_angle_cls=True)  # 使用方向分类器
+    results = ocr.ocr(image_array, cls=True)
+
+    source_text = ""
+    # 遍历识别结果，将每个结果的文本添加到source_text中，并用换行符隔开
+    for line in results:
+        for words in line:
+            source_text += words[-1][0] + '\n'
+    # 去掉最后多余的换行符
+    source_text = source_text.strip()
+
+    # 调用Kimi API的代码获取翻译结果
+    translation_result = call_kimi_api(source_text,target_language)
+
+    if translation_result != "无法连接大语言模型":
+        # 返回翻译结果给前端
+        return jsonify({
+            'base': {
+                'code': 200,  # 表示成功
+                'message': '翻译成功'
+            },
+            'source_text': source_text,
+            'translation': translation_result
+        })
+    else:
+        return jsonify({
+            'base': {
+                'code': 400,  # 表示失败
+                'message': '翻译失败'
+            },
+            'source_text': source_text,
+            'translation': translation_result
+        })
+
+
+@app.route('/translate/document', methods=['POST'])
+def translate_doc():
+    # 检查文件是否为空
+    if 'document' not in request.files or 'user_id' not in request.form or 'target_language' not in request.form:
+        return jsonify({
+            'base': {
+                'code': 400,
+                'message': 'No file found or invalid input'
+            }
+        }), 400
+
+    # 获取请求数据
+    user_id = request.form.get('user_id')
+    target_language = request.form.get('target_language')
+    # 获取上传的文件
+    file = request.files.get('document')
+
+    # 读取文件内容
+    if file.filename.endswith('.pdf'):
+        # 使用PyPDF2读取PDF文件内容
+        content = ''
+        with file.stream as f:
+            reader = PyPDF2.PdfReader(f)
+            for page in reader.pages:
+                content += page.extract_text() + '\n'
+    elif file.filename.endswith('.docx'):
+        # 使用python-docx读取DOCX文件内容
+        file_stream = BytesIO(file.read())
+        doc = Document(file_stream)
+        content = ''
+        for para in doc.paragraphs:
+            content += para.text + '\n'
+    elif file.filename.endswith('.txt'):
+        # 直接读取TXT文件内容
+        content = file.stream.read().decode('utf-8')
+    else:
+        return jsonify({
+            'base': {
+                'code': 500,
+                'message': '不支持的文件格式或文件无法打开'
+            }
+        }), 500
+
+    # 调用Kimi API的代码获取翻译结果
+    translation_result = call_kimi_api(content, target_language)
 
     if translation_result != "无法连接大语言模型":
         # 返回翻译结果给前端
