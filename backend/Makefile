@@ -29,19 +29,9 @@ help:
 	@echo "                      Available service list: [${SERVICES}]"
 	@echo "  env-up            : Start the docker-compose environment."
 	@echo "  env-down          : Stop the docker-compose environment."
-	@echo "  kitex-gen-%       : Generate Kitex service code for a specific service (e.g., make kitex-gen-user)."
-	@echo "  kitex-update-%    : Update Kitex generated code for a specific service (e.g., make kitex-update-user)."
-	@echo "  hertz-gen-api     : Generate Hertz scaffold based on the API IDL."
-	@echo "  test              : Run unit tests for the project."
 	@echo "  clean             : Remove the 'output' directories and related binaries."
 	@echo "  clean-all         : Stop docker-compose services if running and remove 'output' directories and docker data."
 	@echo "  push-%            : Push a specific service to the remote repository (e.g., make push-api)."
-	@echo "  fmt               : Format the codebase using gofumpt."
-	@echo "  import            : Optimize import order and structure."
-	@echo "  vet               : Check for possible errors with go vet."
-	@echo "  lint              : Run golangci-lint on the codebase."
-	@echo "  verify            : Format, optimize imports, and run linters and vet on the codebase."
-	@echo "  license           : Check and add license to go file and shell script."
 
 ## --------------------------------------
 ## 构建与调试
