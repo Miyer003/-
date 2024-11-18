@@ -1,5 +1,5 @@
 from flask import Flask
-from backend.chat.chat import chat_name
+from chat.chat import chat_name
 
 app = Flask(__name__)
 # 注册blueprint
