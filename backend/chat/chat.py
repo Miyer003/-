@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, Blueprint
+from flask import Flask, request, jsonify, Blueprint,current_app
 from openai import OpenAI
 
 # 使用 blueprint，以便 main.py 可以导入该模块
@@ -79,7 +79,8 @@ def record_dialogue():
         ai_response = response.choices[0].message.content.strip()
     except Exception as e:
         # 记录错误日志
-        chat_module.logger.error(f"Failed to generate AI response: {str(e)}")
+        # 其中 blueprint 没有集成 logger
+        current_app.logger.error(f"Failed to generate AI response: {str(e)}")
         # 返回一个包含错误信息的 JSON 响应，状态码为 200
         return jsonify({"base": {"code": 500, "message": f"Failed to generate AI response: {str(e)}"}}), 200
 
