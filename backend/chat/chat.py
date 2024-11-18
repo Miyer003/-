@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, Blueprint
 from openai import OpenAI
 
 # 使用 blueprint，以便 main.py 可以导入该模块
-chat_name = Blueprint('chat_ai', __name__)
+chat_module = Blueprint('chat_ai', __name__)
 
 # 不需要在这边启动，同一从 main.py 中启动
 # app = Flask(__name__)
@@ -42,7 +42,7 @@ dialogue_records = [
     }
 ]
 
-@app.route('/ai/dialogue/record', methods=['POST'])
+@chat_module.route('/ai/dialogue/record', methods=['POST'])
 def record_dialogue():
     # 获取请求头中的 Authorization 令牌
     auth_token = request.headers.get('Authorization')
@@ -79,7 +79,7 @@ def record_dialogue():
         ai_response = response.choices[0].message.content.strip()
     except Exception as e:
         # 记录错误日志
-        app.logger.error(f"Failed to generate AI response: {str(e)}")
+        chat_module.logger.error(f"Failed to generate AI response: {str(e)}")
         # 返回一个包含错误信息的 JSON 响应，状态码为 200
         return jsonify({"base": {"code": 500, "message": f"Failed to generate AI response: {str(e)}"}}), 200
 
@@ -95,7 +95,7 @@ def record_dialogue():
         "record_id": len(dialogue_records)
     }), 200
 
-@app.route('/ai/dialogue/records', methods=['GET'])
+@chat_module.route('/ai/dialogue/records', methods=['GET'])
 def get_dialogue_records():
     # 返回所有对话记录
     return jsonify({
@@ -103,7 +103,7 @@ def get_dialogue_records():
         "records": dialogue_records
     }), 200
 
-@app.route('/ai/dialogue/history', methods=['GET'])
+@chat_module.route('/ai/dialogue/history', methods=['GET'])
 def get_dialogue_history():
     # 获取查询参数
     user_id = request.args.get('user_id')
