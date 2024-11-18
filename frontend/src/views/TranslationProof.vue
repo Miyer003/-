@@ -18,7 +18,7 @@
                   <div class="speak-button" @click="speakUserText">🔊</div>
                   </div>
 
-                  <button @click="handleClick">点击校验</button>
+                  <button @click="checkTranslation">点击校验</button>
               </div>
       
               <div class="total-output">
@@ -129,14 +129,49 @@
       }
       console.log('朗读译文:', this.userText);
     },
-    handleClick() {
-      // 这里可以调用校对 API 来获取校对结果
-      this.grammarResult = '语法检查结果';
-      this.terminologyResult = '术语校验结果';
-      this.consistencyResult = '内容一致性结果';
-      this.styleResult = '语言风格一致性结果';
-      this.optimizationResult = '句式优化结果';
-    },
+    async checkTranslation() {
+  const url = 'http://8.138.30.178/api/translate/proofread';
+  const data = {
+    userID :1,
+    originalText: this.sourceText,
+    translatedText: this.userText,
+  };
+
+  console.log('发送的请求数据:', data);
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+      mode: 'no-cors', // 添加此行以禁用 CORS
+    });
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok ' + response.statusText);
+    }
+
+    const result = await response.json();
+    console.log('接收到的响应数据:', result);
+
+    // API返回的数据结构为 { grammarCheck, terminologyValidation, contentConsistency, languageStyle, sentenceStructure, score }
+    this.score = result.score || 10;
+    this.filledStars = Math.floor(this.score / 20); // 更新星星数量
+
+    // 从API响应中获取校对结果
+    this.grammarResult = result.grammarCheck || '语法检查结果';
+    this.terminologyResult = result.terminologyValidation || '术语校验结果';
+    this.consistencyResult = result.contentConsistency || '内容一致性结果';
+    this.styleResult = result.languageStyle || '语言风格一致性结果';
+    this.optimizationResult = result.sentenceStructure || '句式优化建议';
+
+  } catch (error) {
+    console.error('错误:', error);
+    this.grammarResult = '请求失败，请检查后端服务。';
+  }
+},
     toggleContent(content) {
       this.contentToShow = content;
     },
