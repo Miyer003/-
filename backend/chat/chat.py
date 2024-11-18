@@ -1,9 +1,14 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Blueprint
 from openai import OpenAI
 
-app = Flask(__name__)
+# 使用 blueprint，以便 main.py 可以导入该模块
+chat_name = Blueprint('chat_ai', __name__)
+
+# 不需要在这边启动，同一从 main.py 中启动
+# app = Flask(__name__)
 
 # 设置 DeepSeek API 密钥
+# 这边考虑集成到 config.yaml 中，从配置文件读取会比较安全
 DEEPSEEK_API_KEY = 'sk-971fe5b4ee2748e4b88d697a7c98b319'
 
 # 初始化 OpenAI 客户端
@@ -129,6 +134,3 @@ def get_dialogue_history():
         "session_id": int(session_id) if session_id else None,
         "data": paginated_records
     }), 200
-
-if __name__ == '__main__':
-    app.run(debug=True)
