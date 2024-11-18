@@ -12,12 +12,9 @@ RUN apt-get update && apt-get install -y libgomp1 libgl1-mesa-glx
 # 安装 Python 依赖
 RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r ./deploy/requirements.txt
 
-# 安装 Gunicorn 作为 WSGI 服务器
-RUN pip install gunicorn
-
 ENV FLASK_APP=main.py
 # 开放 5000 端口
 EXPOSE 5000
 
-# 使用 Gunicorn 启动应用
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "main:app"]
+
+CMD ["python3", "main.py"]
