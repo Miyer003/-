@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Blueprint,current_app
 from openai import OpenAI
 import time
 
@@ -10,7 +10,9 @@ import PyPDF2
 from docx import Document
 from io import BytesIO
 
-app = Flask(__name__)
+translate_module = Blueprint('transalte_ai', __name__)
+
+#app = Flask(__name__)
 
 
 client = OpenAI(
@@ -48,7 +50,7 @@ def call_kimi_api(source_text, target_language, max_attempts = 10) -> str:
     return "无法连接大语言模型"
 
 
-@app.route('/translate/instant', methods=['POST'])
+@translate_module.route('/translate/instant', methods=['POST'])
 def translate_instant():
     # 获取请求数据
     data = request.get_json()
@@ -89,7 +91,7 @@ def translate_instant():
         })
 
 
-@app.route('/translate/image', methods=['POST'])
+@translate_module.route('/translate/image', methods=['POST'])
 def translate_ocr():
     # 检查文件是否为空
     if 'image' not in request.files or 'user_id' not in request.form or 'target_language' not in request.form:
@@ -154,7 +156,7 @@ def translate_ocr():
         })
 
 
-@app.route('/translate/document', methods=['POST'])
+@translate_module.route('/translate/document', methods=['POST'])
 def translate_doc():
     # 检查文件是否为空
     if 'document' not in request.files or 'user_id' not in request.form or 'target_language' not in request.form:
@@ -218,5 +220,3 @@ def translate_doc():
             'translation': translation_result
         })
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
