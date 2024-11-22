@@ -8,12 +8,11 @@
         <img src="@/assets/background.png" alt="背景图片" class="backgroundphoto">
         <img src="@/assets/avatar.jpg" alt="头像" class="avatar">
         <div class="ground">
-          <div class="text-muted"><page :userName="userProfile.userName"/></div>
-          <div class="information">          
-            <page :gender="userProfile.gender"
-              :birthDate="userProfile.birthDate"
-              :location="userProfile.location" />
-          </div>
+          <p class="text-muted">咩咩</p>
+          <p class="information">          
+            电话号码：188****4125<br>出生日期：1997-05-06<br>地址：陕西省-咸阳市-杨陵区邰城路3号
+          </p>
+        </div>
         </div>
       </div>
 
