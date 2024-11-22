@@ -24,7 +24,6 @@ const routes = [
   { path: '/user-profile', name: 'UserProfile', component: UserProfile }, // 用户个人主页路由
   { path: '/history1', name: 'History1',component: HistoryData},
   { path: '/page', name: 'page', component: page },
-  { path: '/page/:Transmissions', name: 'massage', component: massage }
 ];
 
 const router = createRouter({
