@@ -9,6 +9,7 @@ import TranslationProof from '../views/TranslationProof.vue';
 import UserFeedback from '../views/UserFeedback.vue';
 import WeekData from '../views/WeekData.vue';
 import UserProfile from '@/views/UserProfile.vue'; // 用户个人主页
+import page from '@/views/Setting-page.vue'; // 确保路径和文件名正确
 const routes = [
   { path: '/', name: 'Home', component: Home },
   { path: '/user-profile', name: 'UserProfile', component: UserProfile },
@@ -22,6 +23,8 @@ const routes = [
   { path: '/week-data', name: 'week-data', component: WeekData },
   { path: '/user-profile', name: 'UserProfile', component: UserProfile }, // 用户个人主页路由
   { path: '/history1', name: 'History1',component: HistoryData},
+  { path: '/page', name: 'page', component: page },
+  { path: '/page/:Transmissions', name: 'massage', component: massage }
 ];
 
 const router = createRouter({
