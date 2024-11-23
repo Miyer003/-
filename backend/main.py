@@ -1,6 +1,6 @@
 from flask import Flask
 from chat.chat import chat_module
-
+from translate.translate_cmp import translate_cmp
 app = Flask(__name__)
 # 注册blueprint
 app.register_blueprint(chat_module)
