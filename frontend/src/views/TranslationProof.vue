@@ -1,64 +1,61 @@
 <template>
   <div>
-      <!-- 侧边栏容器 -->
-      <Sidebar @navigate="handleSidebarNavigation" />
-      <div class="content">
-          <div class="su-input-container">
-              <div class="su-input">
-                  <p>翻译校对</p>
-                  <div class="su-input-1">
-                  <textarea v-model="sourceText" @input="detectSourceLanguage" placeholder="请输入原文" class="source-text"></textarea>
-                  <div class="language-indicator">检测为: {{ sourceDetectedLanguage }}</div>
-                  <div class="speak-button" @click="speakSourceText">🔊</div>
-                  </div>
-  
-                  <div class="su-input-1">
-                  <textarea v-model="userText" @input="detectUserLanguage" placeholder="请输入译文" class="user-text"></textarea>
-                  <div class="language-indicator">检测为: {{ userDetectedLanguage }}</div>
-                  <div class="speak-button" @click="speakUserText">🔊</div>
-                  </div>
-
-                  <button @click="checkTranslation">点击校验</button>
-              </div>
-      
-              <div class="total-output">
-  
-                  <!-- <TranslationScore /> -->
-                  <div class="translation-score">
-                    <span class="score-label">翻译打分：</span>
-                    <span class="score-value">{{ score }}</span>
-                    <div class="rating-stars">
-                      <i v-for="(star, index) in stars" :key="index" :class="['fas', 'fa-star', { 'filled': index < filledStars }]"></i>
-                    </div>
-                  </div>
-  
-                  <div class="output-container">
-                    <div class="output-header">
-                      <button class="output-toggle" @click="toggleContent('grammar')">语法检查</button>
-                      <button class="output-toggle" @click="toggleContent('terminology')">术语校验</button>
-                      <button class="output-toggle" @click="toggleContent('consistency')">内容一致性</button>
-                      <button class="output-toggle" @click="toggleContent('style')">语言风格一致性</button>
-                      <button class="output-toggle" @click="toggleContent('optimization')">句式优化</button>
-                    </div>
-                      <hr style="border-top: 1px solid #ccc; margin: 10px 10;">
-                      <div class="output-content" v-if="contentToShow">
-                        <div v-if="contentToShow === 'grammar'">{{ grammarResult }}</div>
-                        <div v-if="contentToShow === 'terminology'">{{ terminologyResult }}</div>
-                        <div v-if="contentToShow === 'consistency'">{{ consistencyResult }}</div>
-                        <div v-if="contentToShow === 'style'">{{ styleResult }}</div>
-                        <div v-if="contentToShow === 'optimization'">{{ optimizationResult }}</div>
-                      </div>
-                  </div>
-              </div>
+    <!-- 侧边栏容器 -->
+    <Sidebar @navigate="handleSidebarNavigation" />
+    <div class="content">
+      <div class="su-input-container">
+        <div class="su-input">
+          <p>翻译校对</p>
+          <div class="su-input-1">
+            <textarea v-model="sourceText" @input="detectSourceLanguage" placeholder="请输入原文" class="source-text"></textarea>
+            <div class="language-indicator">检测为: {{ sourceDetectedLanguage }}</div>
+            <div class="speak-button" @click="speakSourceText">🔊</div>
           </div>
+
+          <div class="su-input-1">
+            <textarea v-model="userText" @input="detectUserLanguage" placeholder="请输入译文" class="user-text"></textarea>
+            <div class="language-indicator">检测为: {{ userDetectedLanguage }}</div>
+            <div class="speak-button" @click="speakUserText">🔊</div>
+          </div>
+
+          <button @click="checkTranslation">点击校验</button>
+        </div>
+
+        <div class="total-output">
+          <div class="translation-score">
+            <span class="score-label">翻译打分：</span>
+            <span class="score-value">{{ score }}</span>
+            <div class="rating-stars">
+              <i v-for="(star, index) in stars" :key="index" :class="['fas', 'fa-star', { 'filled': index < filledStars }]"></i>
+            </div>
+          </div>
+
+          <div class="output-container">
+            <div class="output-header">
+              <button class="output-toggle" @click="toggleContent('grammar')">语法检查</button>
+              <button class="output-toggle" @click="toggleContent('terminology')">术语校验</button>
+              <button class="output-toggle" @click="toggleContent('consistency')">内容一致性</button>
+              <button class="output-toggle" @click="toggleContent('style')">语言风格一致性</button>
+              <button class="output-toggle" @click="toggleContent('optimization')">句式优化</button>
+            </div>
+            <hr style="border-top: 1px solid #ccc; margin: 10px 10;">
+            <div class="output-content" v-if="contentToShow">
+              <div v-if="contentToShow === 'grammar'">{{ grammarResult }}</div>
+              <div v-if="contentToShow === 'terminology'">{{ terminologyResult }}</div>
+              <div v-if="contentToShow === 'consistency'">{{ consistencyResult }}</div>
+              <div v-if="contentToShow === 'style'">{{ styleResult }}</div>
+              <div v-if="contentToShow === 'optimization'">{{ optimizationResult }}</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  
-    </template>
+  </div>
+</template>
     
     <script>
      import Sidebar from '@/components/Sidebar.vue'; // 导入 Sidebar 组件
-     import  {franc}  from 'franc'; // 使用具名导出
+     import  {franc} from 'franc'; // 使用具名导出
   
   export default {
       name: 'tproof',
@@ -72,19 +69,19 @@
         userText: '',
         sourceDetectedLanguage: '',
         userDetectedLanguage: '',
-        grammarResult: '',
-        terminologyResult: '',
-        consistencyResult: '',
-        styleResult: '',
-        optimizationResult: '',
-        contentToShow: '',
-        score: 90,
+        grammarResult: '请点击检测',
+       terminologyResult: '请点击检测',
+       consistencyResult: '请点击检测',
+       styleResult: '请点击检测',
+       optimizationResult: '请点击检测',
+        contentToShow: 'grammar', // 默认显示语法检查结果
+        score: 0,   //初始化评分
         stars: 5,
-        filledStars: 0
+        filledStars: 0,
       };
     },
     mounted() {
-      this.filledStars = Math.floor(this.score / 20); // 假设评分范围是0-100，每20分点亮一颗星
+      this.filledStars = Math.floor(this.score / 20); // 评分范围是0-100，每20分点亮一颗星
     },
     methods: {
       detectSourceLanguage() {
@@ -95,7 +92,7 @@
     },
     detectLanguage(text) {
       const langCode = franc(text);
-      // 这里可以添加一个映射表将语言代码转换为语言名称
+      // 添加一个映射表将语言代码转换为语言名称
       switch (langCode) {
         case 'zh':
           return '中文';
@@ -109,6 +106,7 @@
           return '未知';
       }
     },
+    
     speakSourceText() {
       // 调用 TTS API 来朗读原文
       if ('speechSynthesis' in window) {
@@ -130,6 +128,56 @@
       console.log('朗读译文:', this.userText);
     },
     async checkTranslation() {
+      //const url = 'http://127.0.0.1:5000/translate/proofread'; 本地测试
+      const url = 'http://8.138.30.178/translate/proofread';      //服务器上
+      
+      // 准备要发送的JSON对象
+      const data = {
+        user_id: '1',
+        originalText: this.sourceText,
+        translatedText: this.userText
+      };
+
+      console.log('发送的请求数据:', data);
+
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${this.token}`,
+            'Content-Type': 'application/json'  // 使用JSON格式
+          },
+          body: JSON.stringify(data) 
+        });
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok ' + response.statusText);
+        }
+
+        const result = await response.json();
+        console.log('接收到的响应数据:', result);
+
+        // 处理响应数据
+        this.score = result.score || 10;
+        this.filledStars = Math.floor(this.score / 20); // 更新星星数量
+
+        this.grammarResult = result.grammarCheck || '语法检查结果';
+        this.terminologyResult = result.terminologyValidation || '术语校验结果';
+        this.consistencyResult = result.contentConsistency || '内容一致性结果';
+        this.styleResult = result.languageStyle || '语言风格一致性结果';
+        this.optimizationResult = result.sentenceStructure || '句式优化建议';
+
+      } catch (error) {
+        console.error('错误:', error);
+        this.grammarResult = '请求失败，请检查后端服务。';
+        this.terminologyResult = '请求失败，请检查后端服务。';
+        this.consistencyResult = '请求失败，请检查后端服务。';
+        this.styleResult = '请求失败，请检查后端服务。';
+        this.optimizationResult = '请求失败，请检查后端服务。';
+      }
+    },
+
+ /* async checkTranslation() {
   const url = 'http://8.138.30.178/api/translate/proofread';
   const data = {
     userID :1,
@@ -146,7 +194,6 @@
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(data),
-      mode: 'no-cors', // 添加此行以禁用 CORS
     });
 
     if (!response.ok) {
@@ -156,7 +203,7 @@
     const result = await response.json();
     console.log('接收到的响应数据:', result);
 
-    // API返回的数据结构为 { grammarCheck, terminologyValidation, contentConsistency, languageStyle, sentenceStructure, score }
+    // API返回的数据结构为 { score, grammarCheck, terminologyValidation, contentConsistency, languageStyle, sentenceStructure, score }
     this.score = result.score || 10;
     this.filledStars = Math.floor(this.score / 20); // 更新星星数量
 
@@ -171,7 +218,47 @@
     console.error('错误:', error);
     this.grammarResult = '请求失败，请检查后端服务。';
   }
-},
+},*/
+    /*async checkTranslation() {
+      const url = 'http://127.0.0.1:5000/translation/proof';
+      const data = {
+        source_text: this.sourceText,
+        translated_text: this.userText
+      };
+
+      console.log('发送的请求数据:', data);
+
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok ' + response.statusText);
+        }
+
+        const result = await response.json();
+        console.log('接收到的响应数据:', result);
+       // API返回的数据结构为 { grammarCheck, terminologyValidation, contentConsistency, languageStyle, sentenceStructure }
+        this.score = data.score || 10;
+        this.filledStars = Math.floor(this.score / 20); // 更新星星数量
+
+        // 从API响应中获取校对结果
+        this.grammarResult = data.grammarCheck || '语法检查结果';
+        this.terminologyResult = data.terminologyValidation || '术语校验结果';
+        this.consistencyResult = data.contentConsistency || '内容一致性结果';
+        this.styleResult = data.languageStyle || '语言风格一致性结果';
+        this.optimizationResult = data.sentenceStructure || '句式优化建议';
+
+      } catch (error) {
+        console.error('错误:', error);
+        this.grammarResult= '请求失败，请检查后端服务。';
+      }
+    },*/
     toggleContent(content) {
       this.contentToShow = content;
     },
