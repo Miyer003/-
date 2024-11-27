@@ -9,6 +9,7 @@ on:
         type: choice
         options:
           - api
+          - frontend
 
 jobs:
   deploy:
@@ -19,6 +20,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Log in to Alibaba Cloud Docker Registry
+        if: ${{ github.event.inputs.service == 'api' }}
         uses: docker/login-action@v3
         with:
           registry: ${{ secrets.ALIYUN_DOCKER_REGISTRY }}
@@ -26,10 +28,12 @@ jobs:
           password: ${{ secrets.ALIYUN_DOCKER_PASSWORD }}
 
       - name: Build and Push Docker Image
+        if: ${{ github.event.inputs.service == 'api' }}
         run: |
           cd $GITHUB_WORKSPACE/backend && bash ./hack/image-build-and-push.sh ${{ github.event.inputs.service }}
 
-      - name: SSH and deploy on server
+      - name: SSH and deploy API on server
+        if: ${{ github.event.inputs.service == 'api' }}
         uses: appleboy/ssh-action@v1.1.0
         with:
           host: ${{ secrets.SERVER_IP }}
@@ -38,3 +42,20 @@ jobs:
           script: |
             cd ~/hack
             bash docker-run.sh ${{ github.event.inputs.service }}
+
+      - name: Install dependencies and build Vue project
+        if: ${{ github.event.inputs.service == 'frontend' }}
+        run: |
+          cd $GITHUB_WORKSPACE/frontend
+          npm ci
+          npm run build
+
+      - name: Upload Vue dist to server
+        if: ${{ github.event.inputs.service == 'frontend' }}
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          source: "./frontend/dist/*"
+          target: "~/frontend/dist/"

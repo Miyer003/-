@@ -3,10 +3,15 @@ kind: Deployment
 metadata:
   name: api-deployment
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: api
+  replicas: 2  # 设置副本数，至少 1 个以保证高可用
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1  # 更新过程中最多有 1 个 Pod 不可用
+      maxSurge: 1        # 更新过程中最多创建 1 个额外的 Pod
   template:
     metadata:
       labels:
@@ -27,5 +32,26 @@ spec:
   ports:
     - port: 5000
       targetPort: 5000
+      # nodePort: 30000
   selector:
-    app: api-service
+    app: api
+  type: NodePort
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: api-ingress
+  namespace: default
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: localhost
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api-service
+                port:
+                  number: 5000
