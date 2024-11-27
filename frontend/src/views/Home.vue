@@ -138,6 +138,10 @@ async mounted() {
 },
 
 methods: {
+  goToHistoryPage() {
+    // 跳转到历史记录页面
+    this.$router.push({ name: 'History1' });
+  },
   // 方法用于加载数据
   async loadData() {
     await this.fetchWeeklyData();  // 获取本周数据
@@ -320,7 +324,7 @@ try {
   // 确保后端返回了成功的响应
   if (response.data.base.code === 200) {
     // 将翻译结果存入 translation
-    this.translation = response.data.base.translation;
+    this.translation = response.data.translation;
 
     console.log('Translation result:', this.translation);  // 确保翻译结果已经更新
 
@@ -341,8 +345,8 @@ try {
 
 
     async translateAPI(text, sourceLanguage, targetLanguage) {
-/*const url = 'http://8.138.30.178/translate/instant';*/
-const url = 'http://127.0.0.1:3001/translate/instant';
+const url = 'http://8.138.30.178/translate/instant';
+/*const url = 'http://127.0.0.1:5000/translate/instant'*/;
 return axios.post(url, {
   user_id: this.userId,
   source_text: text,
@@ -354,7 +358,6 @@ return axios.post(url, {
   },
 });
 },
-
 
     
     renderRadarChart() {
