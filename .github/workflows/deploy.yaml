@@ -47,7 +47,7 @@ jobs:
         if: ${{ github.event.inputs.service == 'frontend' }}
         run: |
           cd $GITHUB_WORKSPACE/frontend
-          npm ci
+          npm install
           npm run build
 
       - name: Upload Vue dist to server
