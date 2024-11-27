@@ -1,13 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Home from '../views/Home.vue';
-import OnlineTranslation from '../views/OnlineTranslation.vue';
-import HistoryData from '../views/HistoryData.vue';
+// import OnlineTranslation from '../views/OnlineTranslation.vue';
+// import HistoryData from '../views/HistoryData.vue';
 import AiChat from '../views/AiChat.vue';
-import AutoPolish from '../views/AutoPolish.vue';
+// import AutoPolish from '../views/AutoPolish.vue';
 import Personalize from '../views/Personalize.vue';
 import TranslationProof from '../views/TranslationProof.vue';
 import UserFeedback from '../views/UserFeedback.vue';
-import WeekData from '../views/WeekData.vue';
+// import WeekData from '../views/WeekData.vue';
 import UserProfile from '@/views/UserProfile.vue'; // 用户个人主页
 import page from '@/views/Setting-page.vue'; // 确保路径和文件名正确
 const routes = [
