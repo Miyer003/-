@@ -5,8 +5,12 @@
         <!-- 源语言选择器 -->
         <select v-model="sourceLanguage" class="source-language-selector">
           <option value="自动语言检查">自动检测语言</option>
+          <option value="英语">英语</option>
           <option value="中文">中文</option>
-          <option value="英文">英文</option>
+          <option value="德语">德语</option>
+          <option value="日语">日语</option>
+          <option value="韩语">韩语</option>
+          <option value="法语">法语</option>
           <!-- 添加其他语言选项 -->
         </select>
         
@@ -16,6 +20,10 @@
         <select v-model="targetLanguage" class="target-language-selector">
           <option value="英文">英文</option>
           <option value="中文">中文</option>
+          <option value="德语">德语</option>
+          <option value="日语">日语</option>
+          <option value="韩语">韩语</option>
+          <option value="法语">法语</option>
           <!-- 添加其他语言选项 -->
         </select>
       </div>
@@ -135,7 +143,7 @@ export default {
 }
 
 .input-field {
-  width: 88%; /* 宽度占满父容器 */
+
   min-height: 255px; /* 最小高度 */
   padding: 25px;
   border: 1px solid  rgb(179, 113, 202);
