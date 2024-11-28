@@ -11,31 +11,63 @@
           </div>
           <div class="ai-dialogue-section">
             <!-- AI头像 -->
-            <img src="@/assets/ai-avatar.png" alt="AI头像" class="ai-avatar" />
+            <img src="@/assets/1.png" alt="AI头像" class="ai-avatar" />
             <!-- AI对话框 -->
             <div class="ai-dialogue-box">
-              <div class="ai-dialogue">AI对话内容</div>
+              <div class="ai-dialogue">
+                <div class="ai-messages-container">
+                  <div
+                    v-for="(message, index) in aiChatMessages"
+                    :key="index"
+                    class="ai-message"
+                  >
+                    <div class="message-content">{{ message.content }}</div>
+                  </div>
+                </div>
+              </div>
               <div class="ai-dialogue-box-buttons">
-                <button>刷新</button>
-                <button>复制</button>
+                <button @click="refreshInfoRetrievalAnswer">刷新</button>
+                <button
+                  @click="copyInformationRetrievalAnswer"
+                  id="copyInfoRetrievalAnswer"
+                >
+                  复制
+                </button>
               </div>
             </div>
             <!-- 用户对话框 -->
             <div class="user-dialogue-box">
-              <div class="user-dialogue">用户对话内容</div>
+              <div class="user-dialogue">
+                <div class="user-messages-container">
+                  <div
+                    v-for="(message, index) in userChatMessages"
+                    :key="index"
+                    class="user-message"
+                  >
+                    <div class="message-content">{{ message.content }}</div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <div class="history">
             <div class="button-section">
               <!-- 新建对话和查看历史对话按钮 -->
-              <button>新建对话</button>
-              <button>查看历史对话</button>
+              <button @click="newInformationRetrievalDialog">新建对话</button>
+              <button @click="viewHistory">查看历史对话</button>
             </div>
             <div class="user-input-section">
-              <!-- 用户输入框 -->
-              <textarea placeholder="用户输入内容"></textarea>
-              <!-- 发送按钮 -->
-              <button>发送</button>
+              <div class="chat-input">
+                <textarea
+                  v-model="userInput"
+                  :disabled="isLoading"
+                  placeholder="请输入问题"
+                  @keyup.enter="sendQuestion"
+                ></textarea>
+                <button @click="sendQuestion" :disabled="isLoading">
+                  {{ isLoading ? '发送中...' : '发送' }}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -45,13 +77,25 @@
           </div>
           <div class="auto-polish-section">
             <!-- AI头像 -->
-            <img src="@/assets/ai-avatar.png" alt="AI头像" class="ai-avatar" />
+            <img src="@/assets/1.png" alt="AI头像" class="ai-avatar" />$
             <!-- AI翻译并润色后的回答框 -->
             <div class="ai-answer-box">
-              <div class="ai-answer">AI润色后回答内容</div>
+              <div class="ai-answer">
+                <div
+                  v-for="(message, index) in chatMessagesList"
+                  :key="index"
+                  :class="
+                    message.type === 'user' ? 'user-message' : 'ai-message'
+                  "
+                >
+                  <div class="message-content">{{ message.content }}</div>
+                </div>
+              </div>
               <div class="ai-answer-box-buttons">
-                <button>刷新</button>
-                <button>复制</button>
+                <button @click="refreshAutoPolishAns">刷新</button>
+                <button @click="copyAutoPolishAnswer" id="copyAutoPolishAnswer">
+                  复制
+                </button>
               </div>
             </div>
             <!-- 用户的待润色文本输入框 -->
@@ -63,29 +107,57 @@
                 justify-content: flex-end;
               "
             >
-              <textarea placeholder="用户待润色文本"></textarea>
+              <div class="chat-input">
+                <textarea
+                  v-model="userInputForAutoPolish"
+                  placeholder="用户待润色文本"
+                  @keyup.enter="sendAutoPolishText"
+                ></textarea>
+              </div>
+
               <div class="user-input-section-bottom">
                 <!-- 用户输入框内部的底侧左部显示文本检测 -->
-                <span style="font-size: 10px">文本检测为英语</span>
+                <span style="font-size: 10px"
+                  >文本检测为{{ sourceDetectedLanguage }}</span
+                >
                 <!-- 用户输入框内部的底侧右部显示发送文本框按钮 -->
-                <button style="border-color: #a58de7">发送文本</button>
+                <button
+                  @click="sendAutoPolishText"
+                  :disabled="isPolishing"
+                  style="border-color: #a58de7"
+                >
+                  {{ isPolishing ? '处理中...' : '发送文本' }}
+                </button>
               </div>
             </div>
           </div>
 
           <div class="button-section">
             <!-- 新建对话和查看历史对话按钮 -->
-            <button>新建对话</button>
-            <button>查看历史对话</button>
+            <button @click="newAutoPolishDialog">新建对话</button>
+            <button @click="viewAutoPolishHistory">查看历史对话</button>
           </div>
         </div>
       </div>
+    </div>
+    <!-- 可以添加错误提示显示 -->
+    <div v-if="autoPolishError" class="error-message">
+      {{ autoPolishError }}
+    </div>
+    <!-- 在信息检索部分添加错误提示 -->
+    <div v-if="retrievalError" class="error-message">
+      {{ retrievalError }}
     </div>
   </div>
 </template>
 
 <script>
 import Sidebar from "../components/Sidebar.vue";
+import { api, sendQuestionToAI } from "../api/chatApi.js";
+import { getChatHistory } from "../api/chatApi.js";
+import { getAutoPolishChatHistory } from "../api/chatApi.js";
+import { sendTextToWenxinForAutoPolish } from "../api/chatApi.js";
+import axios from "axios";
 
 export default {
   components: {
@@ -93,7 +165,7 @@ export default {
   },
   data() {
     return {
-      // 用于存储信息检索部分用户输入的问题
+      // 用于存储信息检索部分用输入的问题
       informationRetrievalQuestion: "",
       // 用于存储信息检索部分AI的回答
       informationRetrievalAnswer: "",
@@ -103,76 +175,290 @@ export default {
       autoPolishAnswer: "",
       // 用于存储文本语种检测结果
       detectedLanguage: "",
+      // 当前用户ID，假设已经获取并存储在这里
+      currentUserId: 123,
+      sourceDetectedLanguage: "",
+      userInput: "",
+      userInputForAutoPolish: "",
+      userChatMessages: [],
+      aiChatMessages: [],
+      chatMessagesList: [],
+      isLoading: false,
+      isPolishing: false, // 添加自动润色的加载状态
+      autoPolishError: null, // 添加错误状态
+      retrievalError: null, // 添加信息检索的错误状态
     };
   },
   methods: {
-    // 信息检索部分发送问题的方法
-    sendInformationRetrievalQuestion() {
-      // 这里需要调用接口文档中的接口来发送问题并获取AI回答
-      // 假设接口为sendQuestionToAI，参数为问题内容
-      // 例如：this.$http.post('/api/sendQuestionToAI', { question: this.informationRetrievalQuestion }).then(response => {
-      //   this.informationRetrievalAnswer = response.data.answer;
-      // });
-      // 实际接口地址和参数需要根据接口文档确定
+    async sendQuestion() {
+      if (this.isLoading) return;
+      this.isLoading = true;
+      
+      try {
+        if (this.userInput.trim() !== "") {
+          // 添加用户消息到显示
+          const userMessage = {
+            type: "user",
+            content: this.userInput,
+          };
+          this.userChatMessages.push(userMessage);
+
+          // 保存当前输入
+          const currentInput = this.userInput;
+          // 清空输入框
+          this.userInput = "";
+
+          // 发送请求到后端
+          const response = await api.post("/ai/dialogue", {
+            user_id: this.currentUserId,
+            input_text: currentInput,
+          });
+
+          // 检查响应
+          if (response.data) {
+            // 添加 AI 回复到显示
+            const aiMessage = {
+              type: "ai",
+              content: response.data.answer || response.data.message,
+            };
+            this.aiChatMessages.push(aiMessage);
+          } else {
+            throw new Error("返回数据为空");
+          }
+        }
+      } catch (error) {
+        console.error("发送问题时发生错误:", error);
+        
+        // 显示错误消息
+        const errorMessage = {
+          type: "error",
+          content: "发送问题失败，请稍后重试",
+        };
+        this.aiChatMessages.push(errorMessage);
+        
+        // 恢复输入内容
+        if (!this.userInput) {
+          this.userInput = currentInput;
+        }
+      } finally {
+        this.isLoading = false;
+      }
     },
-    // 信息检索部分AI回答对话框下刷新按钮的方法
-    refreshInformationRetrievalAnswer() {
-      // 这里可以根据需求重新获取AI回答，可能需要再次调用接口
-      // 具体实现取决于接口文档中的接口定义
+
+    async checkConnection() {
+      try {
+        await api.get('/health-check', { 
+          timeout: 5000,
+          retry: 1 
+        });
+        return true;
+      } catch (error) {
+        console.error("连接检查失败:", error);
+        return false;
+      }
     },
-    // 信息检索部分AI回答对话框下复制按钮的方法
-    copyInformationRetrievalAnswer() {
-      // 实现复制AI回答到剪贴板的功能
-      const textarea = document.createElement("textarea");
-      textarea.value = this.informationRetrievalAnswer;
-      document.body.appendChild(textarea);
-      textarea.select();
-      document.execCommand("copy");
-      document.body.removeChild(textarea);
+
+    // 修改自动润色发送方法
+    async sendAutoPolishText() {
+      if (this.isPolishing) return;
+      this.isPolishing = true;
+      this.autoPolishError = null;
+
+      try {
+        console.log("准备发送润色文本:", this.userInputForAutoPolish); // 调试日志
+
+        if (!this.userInputForAutoPolish.trim()) {
+          throw new Error('请输入需要润色的文本');
+        }
+
+        // 添加用户消息到显示
+        const userMessage = {
+          type: "user",
+          content: this.userInputForAutoPolish
+        };
+        this.chatMessagesList.push(userMessage);
+
+        // 发送语言检测请求
+        console.log("发送语言检测请求"); // 调试日志
+        const detectResponse = await api.post("/api/detectLanguage", {
+          text: this.userInputForAutoPolish
+        });
+
+        console.log("语言检测响应:", detectResponse.data); // 调试日志
+        
+        if (detectResponse.data) {
+          this.sourceDetectedLanguage = detectResponse.data.language === 'zh' ? '中文' : '英文';
+
+          // 发送润色请求
+          console.log("发送润色请求"); // 调试日志
+          const polishResponse = await api.post("/api/translate/polish", {
+            text: this.userInputForAutoPolish,
+            target: detectResponse.data.language === "en" ? "zh" : "en"
+          });
+
+          console.log("润色响应:", polishResponse.data); // 调试日志
+
+          if (polishResponse.data && polishResponse.data.translation) {
+            const aiMessage = {
+              type: "ai",
+              content: polishResponse.data.translation
+            };
+            this.chatMessagesList.push(aiMessage);
+            this.userInputForAutoPolish = ""; // 清空输入
+          } else {
+            throw new Error("润色服务返回数据格式错误");
+          }
+        }
+      } catch (error) {
+        console.error("自动润色过程发生错误:", error);
+        console.error("错误详情:", {
+          message: error.message,
+          response: error.response?.data,
+          status: error.response?.status
+        });
+
+        this.autoPolishError = error.response?.data?.message || error.message || "润色失败，请稍后重试";
+        alert(this.autoPolishError);
+      } finally {
+        this.isPolishing = false;
+        console.log("润色请求处理完成"); // 调试日志
+      }
     },
-    // 自动润色部分发送待润色文本的方法
-    sendAutoPolishText() {
-      // 调用接口检测文本语种并显示
-      // 假设接口为detectLanguage，参数为文本内容
-      // 例如：this.$http.post('/api/detectLanguage', { text: this.autoPolishText }).then(response => {
-      //   this.detectedLanguage = response.data.language;
-      // });
-      // 然后调用接口获取AI的润色回答
-      // 假设接口为sendTextForAutoPolish，参数为待润色文本
-      // 例如：this.$http.post('/api/sendTextForAutoPolish', { text: this.autoPolishText }).then(response => {
-      //   this.autoPolishAnswer = response.data.answer;
-      // });
-      // 实际接口地址和参数需要根据接口文档确定
+
+    // 修改刷新润色答案的方法
+    async refreshAutoPolishAns() {
+      if (this.isPolishing) return;
+      this.isPolishing = true;
+      this.autoPolishError = null;
+
+      try {
+        if (!this.userInputForAutoPolish.trim()) {
+          throw new Error('没有可以重新润色的文本');
+        }
+
+        // 清空当前消息列表
+        this.chatMessagesList = [];
+
+        // 重新添加用户消息
+        const userMessage = {
+          type: "user",
+          content: this.userInputForAutoPolish
+        };
+        this.chatMessagesList.push(userMessage);
+
+        // 重新发送润色请求
+        const response = await api.post("/api/translate/polish", {
+          text: this.userInputForAutoPolish,
+          target: this.sourceDetectedLanguage === "中文" ? "en" : "zh"
+        });
+
+        if (response.data && response.data.translation) {
+          const aiMessage = {
+            type: "ai",
+            content: response.data.translation
+          };
+          this.chatMessagesList.push(aiMessage);
+        } else {
+          throw new Error("刷新润色返回数据格式错误");
+        }
+      } catch (error) {
+        console.error("刷新润色时发生错误:", error);
+        this.autoPolishError = error.message || "刷新失败，请稍后重试";
+        alert(this.autoPolishError);
+      } finally {
+        this.isPolishing = false;
+      }
     },
-    // 自动润色部分AI润色回答对话框下刷新按钮的方法
-    refreshAutoPolishAnswer() {
-      // 类似信息检索部分的刷新逻辑，根据接口文档重新获取润色回答
-    },
-    // 自动润色部分AI润色回答对话框下复制按钮的方法
-    copyAutoPolishAnswer() {
-      // 类似信息检索部分的复制逻辑，将润色回答复制到剪贴板
-    },
-    // 信息检索部分新建对话的方法（刷新页面）
-    newInformationRetrievalDialog() {
-      location.reload();
-    },
-    // 信息检索部分查看历史对话的方法（需根据实际情况实现）
-    viewInformationRetrievalHistory() {
-      // 这里需要根据接口文档获取历史对话数据并展示，可能涉及到与后端的交互
-    },
-    // 自动润色部分新建对话的方法（刷新页面）
+
+    // 修改新建润色对话的方法
     newAutoPolishDialog() {
-      location.reload();
-    },
-    // 自动润色部分查看历史对话的方法（需根据实际情况实现）
-    viewAutoPolishHistory() {
-      // 这里需要根据接口文档获取历史润色文本数据并展示，可能涉及到与后端的交互
-    },
+      try {
+        if (this.isPolishing) {
+          alert("请等待当前润色完成");
+          return;
+        }
+
+        if (confirm("确定要新建自动润色对话吗？此操作将清空当前润色内容。")) {
+          this.userInputForAutoPolish = "";
+          this.chatMessagesList = [];
+          this.sourceDetectedLanguage = "";
+          this.autoPolishError = null;
+        }
+      } catch (error) {
+        console.error("新建对话时发生错误:", error);
+        alert("新建对话失败：" + error.message);
+      }
+    }
   },
 };
 </script>
 
 <style scoped>
+.ai-chat-component {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.chat-header {
+  margin-bottom: 10px;
+}
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+}
+.message-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+}
+.user-message {
+  background-color: #e3f2fd;
+  border-radius: 5px;
+  padding: 5px 10px;
+  max-width: 70%;
+  word-break: break-word;
+  margin-bottom: 10px;
+}
+.ai-message {
+  background-color: #d4edda;
+  border-radius: 5px;
+  padding: 5px 10px;
+  max-width: 70%;
+  word-break: break-word;
+  margin-bottom: 10px;
+}
+.chat-input {
+  display: flex;
+  margin-top: 10px;
+}
+.chat-input textarea {
+  flex: 1;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 5px;
+}
+.chat-input button {
+  margin-left: 10px;
+  padding: 5px 10px;
+  border: none;
+  background-color: #8800ff;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.chat-footer {
+  margin-top: 10px;
+}
+.message-content {
+  word-break: break-all;
+}
 .main-content {
   display: flex;
   flex-direction: column;
@@ -217,6 +503,7 @@ export default {
   display: flex;
   align-items: flex-start;
   height: 75%;
+  margin-bottom: 20px;
 }
 .ai-avatar {
   width: 30px;
@@ -227,30 +514,81 @@ export default {
 }
 .ai-dialogue-box,
 .ai-answer-box,
-.user-dialogue-box,
-textarea {
+.user-dialogue-box {
   border: 1px solid #ccc;
   padding: 10px;
   width: 35%;
-  height: 60%;
+  height: 400px; /* 固定高度 */
+  display: flex;
+  flex-direction: column;
 }
-textarea {
-  width: 80%;
-  border-radius: 10px;
-  border: none;
+.ai-dialogue,
+.user-dialogue {
+  flex: 1;
+  overflow-y: auto; /* 启用垂直滚动 */
+  margin-bottom: 10px;
 }
-
+.ai-messages-container,
+.user-messages-container {
+  padding: 10px;
+}
+.ai-message,
+.user-message {
+  margin-bottom: 10px;
+  word-wrap: break-word; /* 确保长文本会换行 */
+}
+.message-content {
+  background-color: #f5f5f5;
+  padding: 8px 12px;
+  border-radius: 8px;
+  max-width: 100%; /* 确保内容不会超出容器 */
+  word-break: break-word; /* 处理长单词换行 */
+}
 .ai-dialogue-box,
 .ai-answer-box {
   background-color: #f9f9f9;
   margin-right: 50px;
   box-shadow: 0 0 5px rgba(108, 66, 225, 0.7);
   border-radius: 10px;
+  display: flex;
+  flex-direction: column;
 }
-.user-dialogue-box {
-  background-color: #f9f9f9;
-  box-shadow: 0 0 5px rgba(108, 66, 225, 0.7);
-  border-radius: 10px;
+.ai-dialogue-box-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+}
+.ai-dialogue-box-buttons button {
+  padding: 5px 15px;
+  border-radius: 5px;
+  border: 1px solid #a58de7;
+  background-color: white;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.ai-dialogue-box-buttons button:hover {
+  background-color: #f0f0f0;
+}
+/* 自定义滚动条样式 */
+.ai-dialogue::-webkit-scrollbar,
+.user-dialogue::-webkit-scrollbar {
+  width: 6px;
+}
+.ai-dialogue::-webkit-scrollbar-track,
+.user-dialogue::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+.ai-dialogue::-webkit-scrollbar-thumb,
+.user-dialogue::-webkit-scrollbar-thumb {
+  background: #a58de7;
+  border-radius: 3px;
+}
+.ai-dialogue::-webkit-scrollbar-thumb:hover,
+.user-dialogue::-webkit-scrollbar-thumb:hover {
+  background: #8b6cd4;
 }
 .button-section button {
   margin-right: 10px;
@@ -289,5 +627,13 @@ textarea {
 
   border-radius: 10px;
   border-color: #a58de7;
+}
+.error-message {
+  color: #ff4444;
+  font-size: 14px;
+  margin-top: 8px;
+  padding: 8px;
+  background-color: #ffebee;
+  border-radius: 4px;
 }
 </style>
