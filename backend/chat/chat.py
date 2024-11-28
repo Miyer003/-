@@ -1,14 +1,13 @@
-from flask import Flask, request, jsonify, Blueprint,current_app
+from flask import Flask, request, jsonify, Blueprint, current_app
 from openai import OpenAI
+import requests
+from datetime import datetime
+from flask_cors import CORS
 
-# 使用 blueprint，以便 main.py 可以导入该模块
+# 创建蓝图
 chat_module = Blueprint('chat_ai', __name__)
 
-# 不需要在这边启动，同一从 main.py 中启动
-# app = Flask(__name__)
-
 # 设置 DeepSeek API 密钥
-# 这边考虑集成到 config.yaml 中，从配置文件读取会比较安全
 DEEPSEEK_API_KEY = 'sk-971fe5b4ee2748e4b88d697a7c98b319'
 
 # 初始化 OpenAI 客户端
@@ -135,3 +134,136 @@ def get_dialogue_history():
         "session_id": int(session_id) if session_id else None,
         "data": paginated_records
     }), 200
+
+@chat_module.route('/ai/dialogue', methods=['POST'])
+def send_question():
+    """处理信息检索部分的问题"""
+    try:
+        data = request.json
+        user_input = data.get('input_text')
+        user_id = data.get('user_id')
+
+        if not user_input:
+            return jsonify({
+                "status": 400,
+                "message": "输入文本不能为空"
+            }), 400
+
+        # 调用DeepSeek API获取回答
+        response = client.chat.completions.create(
+            model="deepseek-chat",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant"},
+                {"role": "user", "content": user_input},
+            ],
+            stream=False
+        )
+        
+        answer = response.choices[0].message.content.strip()
+
+        # 存储对话记录
+        dialogue_records.append({
+            "user_id": user_id,
+            "sender": "user",
+            "content": user_input,
+            "timestamp": datetime.now().isoformat()
+        })
+        dialogue_records.append({
+            "user_id": user_id,
+            "sender": "ai",
+            "content": answer,
+            "timestamp": datetime.now().isoformat()
+        })
+
+        return jsonify({
+            "status": 200,
+            "answer": answer
+        })
+
+    except Exception as e:
+        current_app.logger.error(f"处理问题时发生错误: {str(e)}")
+        return jsonify({
+            "status": 500,
+            "message": f"服务器错误: {str(e)}"
+        }), 500
+
+@chat_module.route('/api/detectLanguage', methods=['POST'])
+def detect_language():
+    """检测文本语言"""
+    try:
+        data = request.json
+        text = data.get('text')
+        
+        if not text:
+            return jsonify({
+                "status": 400,
+                "message": "文本不能为空"
+            }), 400
+
+        # 这里可以使用第三方服务或库来检测语言
+        # 示例使用简单的规则判断
+        def simple_detect(text):
+            # 简单示例：检查是否包含中文字符
+            if any('\u4e00' <= char <= '\u9fff' for char in text):
+                return 'zh'
+            return 'en'
+        
+        detected_lang = simple_detect(text)
+        
+        return jsonify({
+            "status": 200,
+            "language": detected_lang
+        })
+
+    except Exception as e:
+        current_app.logger.error(f"语言检测时发生错误: {str(e)}")
+        return jsonify({
+            "status": 500,
+            "message": f"服务器错误: {str(e)}"
+        }), 500
+
+@chat_module.route('/api/translate/polish', methods=['POST'])
+def auto_polish():
+    """处理自动润色请求"""
+    try:
+        data = request.json
+        text = data.get('text')
+        target = data.get('target', 'zh')  # 默认目标语言为中文
+        
+        if not text:
+            return jsonify({
+                "status": 400,
+                "message": "文本不能为空"
+            }), 400
+
+        # 调用DeepSeek API进行润色
+        prompt = f"请对以下文本进行润色和优化，目标语言为{'中文' if target == 'zh' else '英文'}：\n{text}"
+        response = client.chat.completions.create(
+            model="deepseek-chat",
+            messages=[
+                {"role": "system", "content": "You are a professional text polishing assistant"},
+                {"role": "user", "content": prompt},
+            ],
+            stream=False
+        )
+        
+        polished_text = response.choices[0].message.content.strip()
+
+        return jsonify({
+            "status": 200,
+            "translation": polished_text
+        })
+
+    except Exception as e:
+        current_app.logger.error(f"文本润色时发生错误: {str(e)}")
+        return jsonify({
+            "status": 500,
+            "message": f"服务器错误: {str(e)}"
+        }), 500
+
+# 只在直接运行此文件时创建应用
+if __name__ == '__main__':
+    app = Flask(__name__)
+    CORS(app)
+    app.register_blueprint(chat_module)
+    app.run(debug=True, host='0.0.0.0', port=5000)
