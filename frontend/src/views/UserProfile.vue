@@ -1,7 +1,6 @@
 <template>
   <div class="UserProfile">
     <h1>用户资料</h1>
-    <!-- 这里添加AI对话组件内容 -->
     <Sidebar @navigate="handleSidebarNavigation" />
     <div class="main-content">
       <div class="background">
@@ -12,7 +11,6 @@
           <p class="information">          
             电话号码：188****4125<br>出生日期：1997-05-06<br>地址：陕西省-咸阳市-杨陵区邰城路3号
           </p>
-        </div>
         </div>
       </div>
 
@@ -126,14 +124,8 @@
       <div class="Settingbutton">
         <button class="settingbutton" @click="settingbutton">修改个人资料</button>
       </div>
-
     </div>
-
-
-
-
-  
-
+  </div>
 </template>
 
 <script>
@@ -282,7 +274,7 @@ inset（可选）：如果需要内部阴影，可以添加这个关键字，如
   height: 119px;
   width: 1079px;
   position: absolute; /* 绝对定位 */
-  top: 185px; /* 距离包含块顶部185像素 */
+  top: 185px; /* 距离包含块顶部185���素 */
   left: 611px; /* 距离包含块左侧611像素 */
   z-index: 2; /* 堆叠顺序 */
   background-color: #DFDAED;
@@ -342,7 +334,7 @@ inset（可选）：如果需要内部阴影，可以添加这个关键字，如
   align-items: center; /* 在弹性盒中，此属性用于垂直居中对齐所有子元素 */
   margin-bottom: 0px; /* 设置元素底部的外边距为0像素，即没有外边距 */
   font-family: '优设标题黑'; /* 设置元素的字体为'Dancing Script'，如果没有这个字体， ,cursive则使用通用的cursive字体族 */
-  font-size: 24px; /* 设置元素文本的字体大小为24像素 */
+  font-size: 24px; /* 设置元素文本的字体大���为24像素 */
   font-weight: 700; /* 等同于 bold */
   color: #ae6ac9; /* 设置元素文本的颜色为十六进制颜色#ae6ac9，这是一种紫色调 */
   padding-bottom: -10px; /* 设置元素底部的内边距为-10像素，即向内压缩元素的底部 */
