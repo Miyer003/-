@@ -3,7 +3,9 @@ from chat.chat import chat_module
 from translate.translate_cmp import translate_cmp
 from translate.translate import translate_module
 from user.user import user
+from flask_cors import CORS
 app = Flask(__name__)
+CORS(app)
 # 注册blueprint
 app.register_blueprint(chat_module)
 app.register_blueprint(translate_cmp)

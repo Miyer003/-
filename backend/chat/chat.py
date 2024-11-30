@@ -7,7 +7,7 @@ from flask_cors import CORS
 
 # 创建蓝图
 chat_module = Blueprint('chat_ai', __name__)
-
+CORS(chat_module)
 # 设置数据库路径
 DATABASE = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'chat.db')
 
@@ -271,9 +271,4 @@ def auto_polish():
             "message": f"服务器错误: {str(e)}"
         }), 500
 
-# 只在直接运行此文件时创建应用
-if __name__ == '__main__':
-    app = Flask(__name__)
-    CORS(app)
-    app.register_blueprint(chat_module)
-    app.run(debug=True, host='0.0.0.0', port=5000)
+
