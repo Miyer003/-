@@ -7,7 +7,7 @@ from hashlib import sha256  # 用于生成密码哈希的SHA-256算法
 user = Blueprint('user', __name__)
 
 #app = Flask(__name__)  # 初始化Flask应用
-CORS(app)  # 允许所有来源的跨域请求
+CORS(user)  # 允许所有来源的跨域请求
 
 # 数据库初始化函数（通常应在部署时运行一次）
 def init_db():
