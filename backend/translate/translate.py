@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, Blueprint,current_app
 from openai import OpenAI
 import time
-
+from flask_cors import CORS
 from PIL import Image
 from paddleocr import PaddleOCR
 import numpy as np
@@ -13,7 +13,7 @@ from io import BytesIO
 translate_module = Blueprint('transalte_ai', __name__)
 
 #app = Flask(__name__)
-
+CORS(translate_module)
 
 client = OpenAI(
     api_key="Moonshot api key",#统一替换成同一个api key
@@ -209,6 +209,7 @@ def translate_doc():
                 'code': 200,  # 表示成功
                 'message': '翻译成功'
             },
+            'source_text': content,
             'translation': translation_result
         })
     else:
@@ -217,6 +218,7 @@ def translate_doc():
                 'code': 400,  # 表示失败
                 'message': '翻译失败'
             },
+            'source_text': content,
             'translation': translation_result
         })
 
