@@ -247,16 +247,16 @@ export default {
 }
 
 .main-content {
-  margin-top: -60px;
-  margin-left: 0px; 
+  margin-top: -46px;
+  margin-left: 36px; 
   padding: 15px;
   position: relative;
   overflow: auto;  /*或者使用 scroll */
   transform: scale(0.8);/*transform 属性用于对元素应用变换。scale(0.8) 表示元素的尺寸将缩小到原始尺寸的 80%。*/
-  width: 1920px; /* 定义容器宽度 */
-  height: 1080px; /* 定义容器高度 */
+  width: 1600px; /* 定义容器宽度 */
+  height: 930px; /* 定义容器高度 */
   z-index: 20; /* 确保这个值高于其他可能遮挡它的元素 */
-  background: linear-gradient(to bottom right, #ab7bfe2e, #5fb7ff42);/* 对角线渐变，从左上到右下 */
+  background: linear-gradient(to bottom right, #ab7bfe18, #5fb7ff1f);/* 对角线渐变，从左上到右下 */
 }
 
 .background {
@@ -264,7 +264,7 @@ export default {
   width: 1573px;
   position: absolute; /* 绝对定位 */
   top: 10px; /* 距离包含块顶部0像素 */
-  left: -50px; /* 距离包含块左侧245像素 */
+  left: -35px; /* 距离包含块左侧245像素 */
   z-index: 1; /* 堆叠顺序 */
 }
 
@@ -1104,7 +1104,7 @@ inset（可选）：如果需要内部阴影，可以添加这个关键字，如
   font-size: 15px;
   position: absolute; /* 绝对定位 */
   top: 65px; /* 距离包含块顶部0像素 */
-  left: 1650px; /* 距离包含块左侧245像素 */
+  left: 1450px; /* 距离包含块左侧245像素 */
   z-index: 4; /* 堆叠顺序 */
 }
 
