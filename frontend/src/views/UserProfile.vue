@@ -1,8 +1,8 @@
 <template>
   <div class="UserProfile">
-    <h1>用户资料</h1>
-    <!-- 这里添加AI对话组件内容 -->
-    <Sidebar @navigate="handleSidebarNavigation" />
+    <div class="sidebar">
+      <Sidebar @navigate="handleSidebarNavigation" />
+    </div>
     <div class="main-content">
       <div class="background">
         <img src="@/assets/background.png" alt="背景图片" class="backgroundphoto">
@@ -242,16 +242,21 @@ export default {
 </script>
 
 <style scoped>
+.sidebar {
+  z-index: 1000 ; /* 确保这个值高于其他可能遮挡它的元素 */
+}
+
 .main-content {
-  margin-top: -110px;
-  margin-left: -180px; 
+  margin-top: -60px;
+  margin-left: 0px; 
   padding: 15px;
   position: relative;
   overflow: auto;  /*或者使用 scroll */
-  transform: scale(0.8);
+  transform: scale(0.8);/*transform 属性用于对元素应用变换。scale(0.8) 表示元素的尺寸将缩小到原始尺寸的 80%。*/
   width: 1920px; /* 定义容器宽度 */
   height: 1080px; /* 定义容器高度 */
-
+  z-index: 20; /* 确保这个值高于其他可能遮挡它的元素 */
+  background: linear-gradient(to bottom right, #ab7bfe2e, #5fb7ff42);/* 对角线渐变，从左上到右下 */
 }
 
 .background {
@@ -259,7 +264,7 @@ export default {
   width: 1573px;
   position: absolute; /* 绝对定位 */
   top: 10px; /* 距离包含块顶部0像素 */
-  left: 10px; /* 距离包含块左侧245像素 */
+  left: -50px; /* 距离包含块左侧245像素 */
   z-index: 1; /* 堆叠顺序 */
 }
 
@@ -268,7 +273,7 @@ export default {
   width: 269px;
   position: absolute;
   top: 50px; 
-  left: 300px; 
+  left: 120px; 
   z-index: 3;
   border-radius: 135px;
   box-shadow: 3px 3px 5px 8px rgba(132, 110, 213, 0.15);
@@ -285,7 +290,7 @@ inset（可选）：如果需要内部阴影，可以添加这个关键字，如
   width: 1079px;
   position: absolute; /* 绝对定位 */
   top: 185px; /* 距离包含块顶部185像素 */
-  left: 611px; /* 距离包含块左侧611像素 */
+  left: 431px; /* 距离包含块左侧611像素 */
   z-index: 2; /* 堆叠顺序 */
   background-color: #DFDAED;
   box-shadow: 0px 3px 6px 0px rgba(0,0,0,0.15);
@@ -318,14 +323,14 @@ inset（可选）：如果需要内部阴影，可以添加这个关键字，如
   width: 1573px;
   position: absolute; /* 绝对定位 */
   top: 0; /* 距离包含块顶部0像素 */
-  left: 245px; /* 距离包含块左侧245像素 */
+  left: 65px; /* 距离包含块左侧245像素 */
   z-index: 2; /* 堆叠顺序 */
 }
 
 .my-Profile{
   position: absolute; /* relative设置元素的定位为相对定位，这意味着元素的位置相对于其正常位置进行偏移 */
   top: 370px;
-  left: 260px;
+  left: 60px;
   display: flex; /* 设置元素的显示类型为弹性盒（flex），这允许子元素在容器内灵活排列 */
   align-items: center; /* 在弹性盒中，此属性用于垂直居中对齐所有子元素 */
   margin-bottom: 0px; /* 设置元素底部的外边距为0像素，即没有外边距 */
@@ -339,7 +344,7 @@ inset（可选）：如果需要内部阴影，可以添加这个关键字，如
 .Personalized-Dressup{
   position: absolute; /* relative设置元素的定位为相对定位，这意味着元素的位置相对于其正常位置进行偏移 */
   top: 370px;
-  left: 800px;
+  left: 600px;
   display: flex; /* 设置元素的显示类型为弹性盒（flex），这允许子元素在容器内灵活排列 */
   align-items: center; /* 在弹性盒中，此属性用于垂直居中对齐所有子元素 */
   margin-bottom: 0px; /* 设置元素底部的外边距为0像素，即没有外边距 */
@@ -353,7 +358,7 @@ inset（可选）：如果需要内部阴影，可以添加这个关键字，如
 .-Setting{
   position: absolute; /* relative设置元素的定位为相对定位，这意味着元素的位置相对于其正常位置进行偏移 */
   top: 370px;
-  left: 1310px;
+  left: 1110px;
   display: flex; /* 设置元素的显示类型为弹性盒（flex），这允许子元素在容器内灵活排列 */
   align-items: center; /* 在弹性盒中，此属性用于垂直居中对齐所有子元素 */
   margin-bottom: 0px; /* 设置元素底部的外边距为0像素，即没有外边距 */
@@ -372,7 +377,7 @@ inset（可选）：如果需要内部阴影，可以添加这个关键字，如
   width: 475px;
   position: absolute;
   top: 424px; 
-  left: 255px; 
+  left: 55px; 
   z-index: 1;
   background-color: #8C7BFD3b; /* 移除了多余的空格 */
   opacity: 0.56; /* 设置透明度 */
@@ -721,7 +726,7 @@ inset（可选）：如果需要内部阴影，可以添加这个关键字，如
   padding: 25px; /* 设置内边距 */
   position: absolute;
   top: 424px; 
-  left: 780px; 
+  left: 580px; 
   z-index: 1;
   background-color: #8C7BFD3b;
   color: #3D629C;
@@ -814,7 +819,7 @@ inset（可选）：如果需要内部阴影，可以添加这个关键字，如
   width: 475px;
   position: absolute;
   top: 424px; 
-  left: 1300px; 
+  left: 1100px; 
   z-index: 1;
   background-color: #8C7BFD3b;
   opacity: 0.56; /* 设置透明度*/
@@ -1114,4 +1119,3 @@ inset（可选）：如果需要内部阴影，可以添加这个关键字，如
 
 
 </style>
-
