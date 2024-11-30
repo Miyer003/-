@@ -128,7 +128,7 @@
       console.log('朗读译文:', this.userText);
     },
     async checkTranslation() {
-      //const url = 'http://127.0.0.1:5000/translate/proofread'; 本地测试
+      //const url = 'http://127.0.0.1:5000/translate/proofread'; //本地测试
       const url = 'http://8.138.30.178/translate/proofread';      //服务器上
       
       // 准备要发送的JSON对象

@@ -21,6 +21,7 @@
           <!-- InputBox 组件 -->
           <InputBox 
             @translate="handleTranslate" 
+            @fileTranslated="handleFileTranslation"
             :isLoading="isLoading"
             class="input-box" 
           />
@@ -28,11 +29,10 @@
 
         <!-- OutputBox 显示翻译结果 -->
         <OutputBox 
-          :translation="translation" 
-          :synonyms="synonyms" 
-          :examples="outputExamples" 
-          class="output-box" 
-        />
+  :translation="translation" 
+  class="output-box" 
+/>
+
       </div>
 
       <!-- 翻译历史 -->
@@ -111,6 +111,7 @@ data() {
     topLanguages: ["English", "Spanish", "French"], // 存储 top_3_languages
     topWords: ["example", "word", "translation"], // 存储 top_words
     translation: '',
+    translatedText: '',  // 保存翻译结果
     synonyms: [],
     examples: [],
     history: [],
@@ -138,6 +139,13 @@ async mounted() {
 },
 
 methods: {
+  handleFileTranslation({ sourceText, translation }) {
+    console.log('Received translation in parent:', { sourceText, translation });
+    this.translation = translation; // 更新父组件的翻译内容
+    this.text = sourceText;  // 更新输入框内容为源文本
+    
+
+  },
   goToHistoryPage() {
     // 跳转到历史记录页面
     this.$router.push({ name: 'History1' });
@@ -153,7 +161,7 @@ methods: {
     console.log("Fetching weekly data for:", { startDate, endDate });
 
     try {
-      const response = await axios.get('http://127.0.0.1:31/v1/weekly-data', {
+      const response = await axios.get('http://8.138.30.178/v1/weekly-data', {
         params: {
           user_id: this.userId,
           start_date: startDate,
@@ -186,7 +194,7 @@ methods: {
     console.log("Fetching translation history for:", { startDate, endDate });
 
     try {
-      const response = await axios.get('http://127.0.0.1:31/v1/user/weekly-translation-history', {
+      const response = await axios.get('http://8.138.30.178/v1/user/weekly-translation-history', {
         params: { user_id: this.userId, start_date: startDate, end_date: endDate },
       });
 
@@ -345,8 +353,8 @@ try {
 
 
     async translateAPI(text, sourceLanguage, targetLanguage) {
+/*const url = 'http://8.138.30.178/translate/instant';*/
 const url = 'http://8.138.30.178/translate/instant';
-/*const url = 'http://127.0.0.1:5000/translate/instant'*/;
 return axios.post(url, {
   user_id: this.userId,
   source_text: text,
