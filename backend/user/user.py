@@ -8,7 +8,6 @@ user = Blueprint('user', __name__)
 CORS(user)
 #app = Flask(__name__)  # 初始化Flask应用
 
-
 # 数据库初始化函数（通常应在部署时运行一次）
 def init_db():
     conn = sqlite3.connect("users.db")  # 连接到SQLite数据库文件
