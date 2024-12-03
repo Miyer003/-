@@ -16,7 +16,7 @@ translate_module = Blueprint('transalte_ai', __name__)
 CORS(translate_module)
 
 client = OpenAI(
-    api_key="Moonshot api key",#统一替换成同一个api key
+    api_key="sk-MVnFZKbcbo5iDslwkiqoqDN1PTWeumy0TltmYUhQwz6bDq1x",
     base_url="https://api.moonshot.cn/v1",
 )
 
