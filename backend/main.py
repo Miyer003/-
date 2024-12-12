@@ -5,7 +5,7 @@ from translate.translate import translate_module
 from user.user import user
 from flask_cors import CORS
 app = Flask(__name__)
-cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+CORS(app, resources=r'/*')
 # 注册blueprint
 app.register_blueprint(chat_module)
 app.register_blueprint(translate_cmp)
