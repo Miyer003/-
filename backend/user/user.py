@@ -28,7 +28,7 @@ def generate_password_hash(password):
     return sha256(password.encode()).hexdigest()  # 将密码编码为字节串，使用SHA-256算法生成哈希值，并返回十六进制表示的字符串
 
 # 注册路由
-@user.route('/register', methods=['POST'])
+@user.route('/users/register', methods=['POST'])
 def register():
     #data = request.get_json()  # 从POST请求中获取JSON数据
     # 提取请求数据
@@ -61,7 +61,7 @@ def register():
         conn.close()  # 关闭数据库连接
 
 # 登录路由
-@user.route('/login', methods=['POST'])
+@user.route('/users/login', methods=['POST'])
 def login():
     init_db()
     data = request.get_json()  # 从POST请求中获取JSON数据
@@ -111,7 +111,7 @@ def verify_birthday():
         conn.close()  # 关闭数据库连接
 
 # 重置密码路由
-@user.route('/reset-password', methods=['POST'])
+@user.route('/users/reset-password', methods=['POST'])
 def reset_password():
     init_db()
     data = request.get_json()  # 从POST请求中获取JSON数据
