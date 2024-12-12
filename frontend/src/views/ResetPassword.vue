@@ -10,13 +10,13 @@
       </div>
       <form @submit.prevent="handleLogin">
         <div class="form-group">
-          <label for="phone" class="inline-label">输入密码</label>
-          <input type="text" id="phone" v-model="phone" placeholder="请输入密码" required />
+          <label for="newPassword" class="inline-label">输入密码</label>
+          <input type="text" id="newPassword" v-model="newPassword" placeholder="请输入密码" required />
         </div>
         <div class="underline"></div>
         <div class="form-group">
-          <label for="birthday" class="inline-label">确认密码</label>
-          <input type="birthday" id="birthday" v-model="birthday" placeholder="请再次输入密码" required />
+          <label for="confirmPassword" class="inline-label">确认密码</label>
+          <input type="confirmPassword" id="confirmPassword" v-model="confirmPassword" placeholder="请再次输入密码" required />
         </div>
         <div class="underline"></div>
         <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
@@ -103,7 +103,7 @@ h2 {
 }
 
 input[type="text"],
-input[type="birthday"] {
+input[type="confirmPassword"] {
   width: 100%;
   padding: 10px;
   border: none;
@@ -178,12 +178,10 @@ input[type="birthday"] {
 <script>
 import axios from "axios"; // 引入axios进行API请求
 export default {
-  created() {
-  this.phone = this.$route.query.phone;
-  },
+
   data() {
     return {
-      phone: '', // 接收的手机号
+      phone:'',
       newPassword: '',
       confirmPassword: '',
       errorMessage: '',
@@ -191,34 +189,39 @@ export default {
   },
   methods: {
     resetPassword() {
-      if (this.newPassword !== this.confirmPassword) {
-    this.errorMessage = '两次输入的密码不一致！';
-    return;
-  }
-
-  const requestData = {
-    phone: this.phone, // 使用从 query 参数获取的手机号
-    newPassword: this.newPassword,
-  };
-
-  axios
-    .post('http://8.138.30.178/reset-password', requestData)
-    .then((response) => {
-      alert('密码重置成功，请重新登录！');
-      this.$router.push({ name: 'Login' });
-    })
-    .catch((error) => {
-      if (error.response && error.response.data) {
-        this.errorMessage = error.response.data.message;
-      } else {
-        this.errorMessage = '无法连接到服务器，请稍后重试！';
+      if(!this.newPassword||!this.confirmPassword){
+      this.errorMessage='请输入密码！';
+      return;
       }
-    });
+      if (this.newPassword !== this.confirmPassword) {
+        this.errorMessage = '两次输入的密码不一致！';
+        return;
+      }
+
+    const requestData = {
+      phone: this.$route.query.phone, // 使用从 query 参数获取的手机号
+      newPassword: this.newPassword,
+    };
+
+    axios
+      .post('http://8.138.30.178/user/reset-password', requestData)
+      .then((response) => {
+        alert('密码重置成功，请重新登录！');
+        //alert(`密码是: ${response.data.password}`);
+        this.$router.push({ name: 'Login' });
+      })
+      .catch((error) => {
+        if (error.response && error.response.data) {
+          this.errorMessage = error.response.data.message;
+        } else {
+          this.errorMessage = '无法连接到服务器，请稍后重试！';
+        }
+      });
+      },
+      navigateBack() {
+        this.$router.push({ name: 'ForgotPassword' });
+      },
     },
-    navigateBack() {
-      this.$router.push({ name: 'ForgotPassword' });
-    },
-  },
 };
 </script>
 
