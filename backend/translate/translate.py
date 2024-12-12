@@ -13,7 +13,7 @@ from io import BytesIO
 translate_module = Blueprint('transalte_ai', __name__)
 
 #app = Flask(__name__)
-CORS(translate_module)
+
 
 client = OpenAI(
     api_key="sk-MVnFZKbcbo5iDslwkiqoqDN1PTWeumy0TltmYUhQwz6bDq1x",

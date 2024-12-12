@@ -4,7 +4,7 @@ from flask_cors import CORS
 
 translate_cmp = Blueprint('translate_cmp', __name__)
 #app = Flask(__name__)
-CORS(translate_cmp)  # 允许所有域名访问
+
 # 配置你的 OpenAI API Key 和基础 URL
 api_key = "sk-7s63CxEEh75mtgaktYAJAAM86VMY3FfJbr146AQ3NZkTz6rl"  # 请替换为你的实际 API Key
 base_url = "https://api.moonshot.cn/v1"

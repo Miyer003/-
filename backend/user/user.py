@@ -5,7 +5,7 @@ import sqlite3  # SQLite数据库库
 from hashlib import sha256  # 用于生成密码哈希的SHA-256算法
 # 创建蓝图
 user = Blueprint('user', __name__)
-CORS(user)
+
 #app = Flask(__name__)  # 初始化Flask应用
 
 # 数据库初始化函数（通常应在部署时运行一次）
@@ -28,7 +28,7 @@ def generate_password_hash(password):
     return sha256(password.encode()).hexdigest()  # 将密码编码为字节串，使用SHA-256算法生成哈希值，并返回十六进制表示的字符串
 
 # 注册路由
-@user.route('/users/register', methods=['POST'])
+@user.route('/user/register', methods=['POST'])
 def register():
     #data = request.get_json()  # 从POST请求中获取JSON数据
     # 提取请求数据
@@ -61,7 +61,7 @@ def register():
         conn.close()  # 关闭数据库连接
 
 # 登录路由
-@user.route('/users/login', methods=['POST'])
+@user.route('/user/login', methods=['POST'])
 def login():
     init_db()
     data = request.get_json()  # 从POST请求中获取JSON数据
@@ -89,7 +89,7 @@ def login():
         conn.close()  # 关闭数据库连接
 
 # 忘记密码验证生日路由
-@user.route('/forgot-password/verify', methods=['POST'])
+@user.route('/user/forgot-password/verify', methods=['POST'])
 def verify_birthday():
     init_db()
     data = request.get_json()  # 从POST请求中获取JSON数据
@@ -111,7 +111,7 @@ def verify_birthday():
         conn.close()  # 关闭数据库连接
 
 # 重置密码路由
-@user.route('/users/reset-password', methods=['POST'])
+@user.route('/user/reset-password', methods=['POST'])
 def reset_password():
     init_db()
     data = request.get_json()  # 从POST请求中获取JSON数据
@@ -135,5 +135,4 @@ def reset_password():
     finally:
         conn.close()  # 关闭数据库连接
 
-#if __name__ == '__main__':
-#    app.run(debug=True)  # 运行Flask应用，开启调试模式
+
