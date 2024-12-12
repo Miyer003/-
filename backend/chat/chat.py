@@ -7,7 +7,7 @@ from flask_cors import CORS
 
 # 创建蓝图
 chat_module = Blueprint('chat_ai', __name__)
-CORS(chat_module)
+
 # 设置数据库路径
 DATABASE = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'chat.db')
 

@@ -5,7 +5,7 @@ from translate.translate import translate_module
 from user.user import user
 from flask_cors import CORS
 app = Flask(__name__)
-CORS(app)
+CORS(app, supports_credentials=True, resources=r'/*')
 # 注册blueprint
 app.register_blueprint(chat_module)
 app.register_blueprint(translate_cmp)
@@ -13,4 +13,4 @@ app.register_blueprint(translate_module)
 app.register_blueprint(user)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5001, debug=True)
