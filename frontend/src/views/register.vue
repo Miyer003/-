@@ -121,7 +121,7 @@ export default {
       }
 
       try {
-        const response = await axios.post('http://8.138.30.178/register', formData, {
+        const response = await axios.post('http://8.138.30.178/user/register', formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
         alert(response.data.message);

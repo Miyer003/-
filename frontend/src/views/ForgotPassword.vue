@@ -180,7 +180,7 @@ export default {
   methods: {
     async verifyBirthday() {
       try {
-        const response = await axios.post("http://8.138.30.178/forgot-password/verify", {
+        const response = await axios.post("http://8.138.30.178/user/forgot-password/verify", {
           phone: this.phone,
           birthday: this.birthday,
         });

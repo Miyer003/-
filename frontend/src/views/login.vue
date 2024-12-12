@@ -52,12 +52,13 @@ export default {
         alert("手机号和密码不能为空！");
         return;  // 如果为空，阻止后续的表单提交
       }
+
       const loginData = {
         phone: this.phone,
         password: this.password,
       };
 
-      axios.post('http://8.138.30.178/login', loginData)
+      axios.post('http://8.138.30.178/user/login', loginData)
         .then((response) => {
           alert(response.data.message);
           this.navigateToHome();
