@@ -5,7 +5,7 @@ import sqlite3  # SQLite数据库库
 from hashlib import sha256  # 用于生成密码哈希的SHA-256算法
 # 创建蓝图
 user = Blueprint('user', __name__)
-
+ID = 1
 #app = Flask(__name__)  # 初始化Flask应用
 
 # 数据库初始化函数（通常应在部署时运行一次）
@@ -17,7 +17,8 @@ def init_db():
         phone TEXT PRIMARY KEY,  
         password TEXT NOT NULL,  
         birthday TEXT,  
-        avatar TEXT  
+        avatar TEXT,
+        user_id
     )
     """)  # 如果表不存在，则创建用户表
     conn.commit()  # 提交事务
@@ -38,7 +39,9 @@ def register():
     #confirmPassword = request.form.get('confirmPassword')
     birthday = request.form.get('birthday')
     avatar = request.form.get('avatar')
-
+    global ID
+    ID = ID + 1
+    user_id = ID
     # 检查两次输入的密码是否一致
     #if password != confirmPassword:
     #    return jsonify({'message': 'Passwords do not match'}), 400  # 密码不匹配，返回400错误
@@ -53,8 +56,8 @@ def register():
 
         # 将密码哈希后存入数据库
         hashed_password = generate_password_hash(password)
-        cur.execute("INSERT INTO user (phone, password, birthday, avatar) VALUES (?, ?, ?, ?)",
-                    (phone, hashed_password, birthday, avatar))
+        cur.execute("INSERT INTO user (phone, password, birthday, avatar, user_id) VALUES (?, ?, ?, ?, ?)",
+                    (phone, hashed_password, birthday, avatar, user_id))
         conn.commit()  # 提交事务
         return jsonify({'message': 'User registered successfully'}), 201  # 注册成功，返回201状态码
     finally:
@@ -72,15 +75,15 @@ def login():
     conn = sqlite3.connect("users.db")
     try:
         cur = conn.cursor()
-        cur.execute("SELECT password FROM user WHERE phone=?", (phone,))
-        user_password_hash = cur.fetchone()
-
-        if user_password_hash:
-            stored_hash = user_password_hash[0]  # 数据库中存储的密码哈希
+        cur.execute("SELECT password, user_id FROM user WHERE phone=?", (phone,))
+        user_info = cur.fetchone()
+        if user_info:
+            stored_hash, user_id = user_info  # 数据库中存储的密码哈希
             input_hash = generate_password_hash(password)  # 输入密码的哈希
 
             if stored_hash == input_hash:
-                return jsonify({'message': 'Login successful'}), 200  # 登录成功，返回200状态码
+                return jsonify({'message': 'Login successful'
+                               'user_id': user_id}), 200  # 登录成功，返回200状态码
             else:
                 return jsonify({'message': 'Invalid credentials'}), 401  # 凭证无效，返回401错误
         else:
