@@ -79,7 +79,7 @@ init_db()
 
 
 # 上传翻译校对的记录
-@app.post("/translate/upproofread")
+@record.post("/translate/upproofread")
 async def save_proofread_result(request: ProofreadRequest):
     try:
         conn = get_db_connection()
@@ -109,7 +109,7 @@ async def save_proofread_result(request: ProofreadRequest):
 
 
 # 查看翻译校对的历史记录
-@app.get("/translate/history")
+@record.get("/translate/history")
 async def get_history(user_id: int = Query(..., description="User ID")):
     try:
         conn = get_db_connection()
