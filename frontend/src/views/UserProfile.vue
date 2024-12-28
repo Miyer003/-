@@ -8,9 +8,11 @@
         <img src="@/assets/background.png" alt="背景图片" class="backgroundphoto">
         <img src="@/assets/avatar.jpg" alt="头像" class="avatar">
         <div class="ground">
-          <p class="text-muted">咩咩</p>
+          <p class="text-muted"><span id="userName">咩咩</span></p>
           <p class="information">          
-            电话号码：188****4125<br>出生日期：1997-05-06<br>地址：陕西省-咸阳市-杨陵区邰城路3号
+            性别：<span id="gender">女</span>；电话号码：<span id="phone">188****4125</span><br>
+            出生日期：<span id="birthDate">1997-05-06</span><br>
+            地址：<span id="address">陕西省-咸阳市-杨陵区邰城路3号</span>
           </p>
         </div>
       </div>
@@ -139,106 +141,111 @@
 import Sidebar from '@/components/Sidebar.vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router'; // 引入useRouter
-import page from '@/views/Setting-page.vue'; // 确保路径和文件名正确
+import { onMounted } from 'vue';
+import { useStore } from 'vuex'; // 引入useStore
 
 export default {
   components: {
-    Sidebar,
-    page
+    Sidebar
   },
- 
-
-
-  methods: {
-    handleSidebarNavigation() {
-      // 处理侧边栏导航的逻辑
-    },
-
-    updateSettings() {
-      console.log('User profile updated:', this.userProfile);
-      localStorage.setItem('userProfile', JSON.stringify(this.userProfile));
-    },
-    
-    bindEmail() {
-      // 调用后端API进行邮箱绑定
-      axios.post('/api/bind-email', { email: this.email })
-        .then(response => {
-          // 处理成功逻辑
-        })
-        .catch(error => {
-          // 处理错误逻辑
-        });
-    },
-
-    bindPhone() {
-      // 调用后端API进行手机绑定
-      axios.post('/api/bind-phone', { phoneNumber: this.phoneNumber })
-        .then(response => {
-          // 处理成功逻辑
-        })
-        .catch(error => {
-          // 处理错误逻辑
-        });
-    },
-
-    settingbutton (){
-            //  路径/home对应我在router目录下index.js中定义的path属性值
-               //this.$router.push('/home');
-            //  对应router目录下index.js中定义的name
-                this.$router.push({name:'page'});
-            },
-
-    fetchUserProfile(userId) {
-    // 这里编写获取用户信息的逻辑，例如 API 调用
-      axios.get(`/api/user/${userId}`)
-        .then(response => {
-          this.userProfile = response.data; // 假设响应中包含用户信息
-        });
-        
-  }
-
-  },
-
-
-  //props: {
-  //  userName: string,
-  //  gender: string, // 默认值为'male'
-  //  birthDate: string,
-  //  location: string 
-  // },
-
-
-  data() {
-  return {
-    userProfile: {
-        userName: '咩咩',
-        gender: 'male',  
-        birthDate: '1997-05-06',
-        location: '陕西省-咸阳市-杨陵区邰城路3号',
-      },
-    email: '',
-    phoneNumber: '',
-    speechRate: 'normal',
-    pronunciation: 'american',
-    gender: 'male',
-    pronunciationMode: 'word',
-    autoPronunciation: false
-    };
-  },
-
 
   setup() {
-  const router = useRouter(); // 获取路由实例
+    const router = useRouter(); // 获取路由实例
+    const store = useStore(); // 获取Vuex store实例
 
-  function goToHome() {
-    router.push('/page/:Transmissions'); // 导航到 '/home' 路由
+    // 定义用户信息
+    const userProfile = {
+      user_id: store.state.user_id || 1, // 从 Vuex 中获取 user_id
+      userName: '咩咩',
+      gender: '女',
+      birthDate: '1997-05-06',
+      location: '陕西省-咸阳市-杨陵区邰城路3号',
+      email: '',
+      mobile: ''
+    };
+
+    // 定义其他数据
+    const email = '';
+    const phoneNumber = '';
+    const speechRate = 'normal';
+    const pronunciation = 'american';
+    const gender = 'male';
+    const pronunciationMode = 'word';
+    const autoPronunciation = false;
+
+    // 获取用户信息的方法
+    function fetchUserProfile() {
+      const data = { user_id: userProfile.user_id };
+      axios.post('http://localhost:8080/users/info', data)
+        .then(response => {
+          // 处理成功逻辑，更新userProfile
+          if (response.data && response.data.user_id) {
+            Object.assign(userProfile, response.data);
+          }
+        })
+        .catch(error => {
+          // 处理错误逻辑
+          console.error('获取个人信息失败', error);
+        });
+    }
+
+    // 绑定邮箱的方法
+    function bindEmail() {
+      // 调用后端API进行邮箱绑定
+      axios.post('http://localhost:8080/api/bind-email', { email: email })
+        .then(response => {
+          // 处理成功逻辑
+          console.log('Email绑定成功', response);
+          userProfile.email = email;
+        })
+        .catch(error => {
+          // 处理错误逻辑
+          console.error('Email绑定失败', error);
+        });
+    }
+
+    // 绑定手机的方法
+    function bindPhone() {
+      // 调用后端API进行手机绑定
+      axios.post('http://localhost:8080/api/bind-phone', { phoneNumber: phoneNumber })
+        .then(response => {
+          // 处理成功逻辑
+          console.log('手机绑定成功', response);
+          userProfile.mobile = phoneNumber;
+        })
+        .catch(error => {
+          // 处理错误逻辑
+          console.error('手机绑定失败', error);
+        });
+    }
+
+    // 修改个人资料的方法
+    function settingbutton() {
+      // 导航到 '/page/:Transmissions' 路由
+      router.push({ name: 'page', params: { Transmissions: 'UserSettings' } });
+    }
+
+    // 组件挂载时获取用户信息
+    onMounted(() => {
+      fetchUserProfile();
+    });
+
+    return {
+      userProfile,
+      email,
+      phoneNumber,
+      speechRate,
+      pronunciation,
+      gender,
+      pronunciationMode,
+      autoPronunciation,
+      handleSidebarNavigation: () => {},
+      bindEmail,
+      bindPhone,
+      settingbutton
+    };
   }
-  
-  return { goToHome };
-}
 };
-
-
 </script>
 
 <style scoped>
@@ -247,12 +254,12 @@ export default {
 }
 
 .main-content {
-  margin-top: -46px;
-  margin-left: 36px; 
+  margin-top: -94px;
+  margin-left: -45px; 
   padding: 15px;
   position: relative;
   overflow: auto;  /*或者使用 scroll */
-  transform: scale(0.8);/*transform 属性用于对元素应用变换。scale(0.8) 表示元素的尺寸将缩小到原始尺寸的 80%。*/
+  transform: scale(0.7);/*transform 属性用于对元素应用变换。scale(0.8) 表示元素的尺寸将缩小到原始尺寸的 80%。*/
   width: 1600px; /* 定义容器宽度 */
   height: 930px; /* 定义容器高度 */
   z-index: 20; /* 确保这个值高于其他可能遮挡它的元素 */
