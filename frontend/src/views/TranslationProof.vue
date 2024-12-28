@@ -82,7 +82,7 @@ export default {
   },
   data() {
     return {
-      userId: this.$store.state.user_id, // 从 Vuex 中获取 user_id,
+      userId: this.$store.state.user_id || 1, // 从 Vuex 中获取 user_id,
       sourceText: '',
       userText: '',
       sourceDetectedLanguage: '',
