@@ -82,7 +82,7 @@ def login():
             input_hash = generate_password_hash(password)  # 输入密码的哈希
 
             if stored_hash == input_hash:
-                return jsonify({'message': 'Login successful'
+                return jsonify({'message': 'Login successful',
                                'user_id': user_id}), 200  # 登录成功，返回200状态码
             else:
                 return jsonify({'message': 'Invalid credentials'}), 401  # 凭证无效，返回401错误
