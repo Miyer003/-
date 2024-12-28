@@ -35,6 +35,7 @@
 
 <script>
 import axios from 'axios';
+import { useStore } from 'vuex';  // 确保引入了 useStore
 
 export default {
   data() {
@@ -43,7 +44,6 @@ export default {
       searchQuery: '',
       menuItems: [
         { text: '首页', icon: 'fas fa-home', route: 'Home' },
-        { text: '历史数据', icon: 'fas fa-history', route: 'history-data' },
         { text: 'AI对话', icon: 'fas fa-robot', route: 'ai-chat' },
         { text: '个性化定制', icon: 'fas fa-cogs', route: 'personalize' },
         { text: '翻译校对', icon: 'fas fa-check', route: 'translation-proof' },
@@ -52,6 +52,7 @@ export default {
     };
   },
   methods: {
+    
     handleLogout(event) {
       // 阻止 router-link 的默认行为，避免跳转到个人主页
       event.preventDefault();
@@ -67,6 +68,7 @@ export default {
       // 可以加入搜索逻辑
     },
     fetchUserInfo() {
+      const store = useStore(); // 获取Vuex store实例
       axios.get('http://localhost:8080/users/info', {
         params: {
           user_id:store.state.user_id || 1, // 假设用户ID是1，或者从其他地方获取
