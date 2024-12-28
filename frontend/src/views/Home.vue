@@ -1,3 +1,5 @@
+handleSidebarNavigation
+
 <template>
   <div class="home">
     <!-- 在线翻译字样 -->
@@ -23,6 +25,7 @@
             @translate="handleTranslate" 
             @fileTranslated="handleFileTranslation"
             :isLoading="isLoading"
+            :user-id="userId"
             class="input-box" 
           />
         </div>
@@ -83,7 +86,7 @@
 
   </div>
   <div class="translation-data">
-    <p><strong>本周最常翻译的词</strong></p>
+    <p><strong>本周最常翻译词</strong></p>
     <ul>
       <li v-for="(word, index) in topWords" :key="`word-${index}`">
         {{ word }}
@@ -115,10 +118,11 @@ data() {
     synonyms: [],
     examples: [],
     history: [],
-    weeklyTranslationCount: 0,
-    weeklyAiDialogCount: 5,
+    weeklyTranslationCount: 10,
+    weeklyAiDialogCount: 15,
     weeklyTranslations: [],
-    userId: Math.floor(Math.random() * 100000).toString(), // 随机生成 user_id
+    /*userId: Math.floor(Math.random() * 100000).toString(), // 随机生成 user_id*/
+    userId: this.$store.state.user_id, // 从 Vuex 中获取 user_id
     isLoading: false, // 初始化 isLoading 状态
     translationStats: [
       { languagePair: '汉译英', count: 8 },
@@ -131,6 +135,7 @@ data() {
 },
 async mounted() {
   // 调用一个方法来获取所有的数据，并确保数据加载完成
+  console.log("User ID from Vuex store:", this.userId);
   await this.loadData();
   this.renderBarChart();  // 在数据获取完成后渲染图表
   this.renderPieChart();
@@ -139,6 +144,9 @@ async mounted() {
 },
 
 methods: {
+  handleSidebarNavigation() {
+      // 方法的实现
+    },
   handleFileTranslation({ sourceText, translation }) {
     console.log('Received translation in parent:', { sourceText, translation });
     this.translation = translation; // 更新父组件的翻译内容
@@ -157,59 +165,53 @@ methods: {
   },
 
   async fetchWeeklyData() {
-    const { startDate, endDate } = this.getWeekDateRange();
-    console.log("Fetching weekly data for:", { startDate, endDate });
+  const { startDate, endDate } = this.getWeekDateRange();
+  console.log("Fetching weekly data for:", { startDate, endDate });
 
-    try {
-      const response = await axios.get('http://8.138.30.178/v1/weekly-data', {
-        params: {
-          user_id: this.userId,
-          start_date: startDate,
-          end_date: endDate,
-        },
-      });
+  try {
+    const response = await axios.get('http://8.138.30.178/v1/weekly-data', {
+      params: {
+        user_id: this.userId,
+        start_date: startDate,
+        end_date: endDate,
+      },
+    });
 
-      if (response.data && response.data.code === 200) {
-        const { total_translations, translation_ranking, total_sentence_queries, total_ai_conversations, total_synonym_queries } = response.data;
-        this.weeklyTranslationCount = total_translations;
-        this.weeklyAiDialogCount = total_ai_conversations;
-        this.translationStats = translation_ranking.map(item => ({
-          languagePair: item.language_pair,
-          count: item.count,
-        }));
-        this.totalSentenceQueries = total_sentence_queries;
-        this.totalSynonymQueries = total_synonym_queries;
-      } else {
-        console.error('Failed to fetch weekly data:', response.data);
-        this.setDefaultWeeklyData(); // 设置默认数据
-      }
-    } catch (error) {
-      console.error('Error fetching weekly data:', error);
+    if (response.data && response.data.base.code === 200) {
+      const { nums, top_3_languages } = response.data;
+      
+      // 设置总翻译次数
+      this.weeklyTranslationCount = nums;
+
+      // 确保AI对话次数为16
+      this.weeklyAiDialogCount = 16;
+
+      // 设置翻译统计数据
+      this.translationStats = top_3_languages.map(item => ({
+        languagePair: item.target_language,  // 后端返回的是目标语言
+        count: item.count,
+      }));
+
+    } else {
+      console.error('Failed to fetch weekly data:', response.data);
       this.setDefaultWeeklyData(); // 设置默认数据
     }
-  },
+  } catch (error) {
+    console.error('Error fetching weekly data:', error);
+    this.setDefaultWeeklyData(); // 设置默认数据
+  }
+}
+,
 
-  async fetchWeeklyTranslationHistory() {
-    const { startDate, endDate } = this.getWeekDateRange();
-    console.log("Fetching translation history for:", { startDate, endDate });
+async fetchWeeklyTranslationHistory() {
+  const { startDate, endDate } = this.getWeekDateRange();
+  console.log("Fetching translation history for:", { startDate, endDate });
 
-    try {
-      const response = await axios.get('http://8.138.30.178/v1/user/weekly-translation-history', {
-        params: { user_id: this.userId, start_date: startDate, end_date: endDate },
-      });
+  // 直接使用默认数据，不进行接口调用
+  this.topLanguages = ["English", "Spanish", "French"];  // 默认的翻译语言
+  this.topWords = ["hello", "world", "translation"];  // 默认的翻译词汇
+},
 
-      if (response.data && response.data.weekly_translation_history) {
-        this.topLanguages = response.data.weekly_translation_history.top_3_languages;
-        this.topWords = response.data.weekly_translation_history.top_words;
-      } else {
-        console.error('Failed to fetch translation history:', response.data);
-        this.setDefaultTranslationHistory(); // 设置默认数据
-      }
-    } catch (error) {
-      console.error('Error fetching translation history:', error);
-      this.setDefaultTranslationHistory(); // 设置默认数据
-    }
-  },
 
   setDefaultWeeklyData() {
     this.weeklyTranslationCount = 10; // 默认翻译次数
@@ -297,7 +299,7 @@ methods: {
       },
     });
   },
-
+  
   // 渲染雷达图
   renderRadarChart() {
     // 雷达图的渲染逻辑
@@ -336,11 +338,11 @@ try {
 
     console.log('Translation result:', this.translation);  // 确保翻译结果已经更新
 
+    
     // 保存历史记录
     this.history.push({ text, translation: this.translation });
 
-    // 更新本周翻译数据
-    this.updateWeeklyData(text);
+
   } else {
     console.error('Translation error:', response.data.base.message);
   }
@@ -353,8 +355,8 @@ try {
 
 
     async translateAPI(text, sourceLanguage, targetLanguage) {
-/*const url = 'http://8.138.30.178/translate/instant';*/
 const url = 'http://8.138.30.178/translate/instant';
+/*const url = 'http://127.0.0.1:5000/translate/instant';*/
 return axios.post(url, {
   user_id: this.userId,
   source_text: text,
