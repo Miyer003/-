@@ -15,7 +15,12 @@
                 >文本风格:</label
               >
               <select v-model="textStyle" id="textStyle" class="form-control">
-                <option value="">请选择</option>
+                <option value="">正式文体：语言规范、严谨，用词准确、专业，句式较为复杂，多使用长句、复合句，较少使用口语化表达和缩写形式。</option>
+                <option value="">商务文体：简洁明了、专业精准，注重表达的准确性和客观性，常使用专业术语和固定搭配，语气较为正式、礼貌。</option>
+                <option value="">科技文体：逻辑性强，大量使用专业词汇和技术术语，语言表达精确，常包含复杂的概念和数据，句式结构较为严谨。</option>
+                <option value="">文学文体：语言优美、富有感染力，注重形象性和艺术性，常使用各种修辞手法，如比喻、拟人、夸张等，用词丰富多样，句式灵活多变。</option>
+                <option value="">口语化文体：语言通俗易懂、自然流畅，多使用简单句和常用词汇，语气随意、亲切，常包含口语化的表达和习惯用语。</option>
+                <option value="">幽默文体：语言诙谐风趣，善于运用夸张、双关、反语等修辞手法，以达到幽默的效果，使读者在轻松愉快的氛围中接受信息。</option>
                 <!-- 这里可以添加更多选项 -->
               </select>
             </div>
@@ -31,7 +36,12 @@
                 id="professionalField"
                 class="form-control"
               >
-                <option value="">请选择</option>
+                <option value="">医学</option>
+                <option value="">法律</option>
+                <option value="">信息技术</option>
+                <option value="">金融</option>
+                <option value="">机械工程</option>
+                <option value="">化工</option>
                 <!-- 这里可以添加更多选项 -->
               </select>
             </div>
@@ -74,6 +84,30 @@
                   />
                   美式英语</label
                 >
+                <label
+                  ><input
+                    type="radio"
+                    value="LM"
+                    v-model="languagePreference"
+                  />
+                  拉丁美洲西班牙语</label
+                >
+                <label
+                  ><input
+                    type="radio"
+                    value="Brazil"
+                    v-model="languagePreference"
+                  />
+                  巴西葡萄牙语</label
+                >
+                <label
+                  ><input
+                    type="radio"
+                    value="Canada"
+                    v-model="languagePreference"
+                  />
+                  加拿大法语</label
+                >
                 <!-- 这里可以添加更多语言选项 -->
               </div>
             </div>
@@ -106,6 +140,8 @@
 
 <script>
 import Sidebar from "../components/Sidebar.vue";
+import { message } from 'ant-design-vue';
+import axios from 'axios';
 
 export default {
   components: {
@@ -136,7 +172,7 @@ export default {
       };
 
       // 调用上传个性化设置接口
-      this.$http
+      axios
         .post("/settings/upload", settingsData)
         .then((response) => {
           if (response.status === 200) {
@@ -149,21 +185,33 @@ export default {
         .catch((error) => {
           console.error("保存个性化设置时发生错误", error);
         });
-    },    
+        // 无论是否成功，都弹出提示框
+        message.info('已上传个性化');
+    },
     resetSettings() {
       // 重置设置的逻辑
+      
       this.$data = this.$data.constructor();
     },
     importGlossary() {
       // 假设这里通过某种方式获取用户粘贴的术语库内容并设置到customGlossary
-      const customGlossaryContent = this.getPastedGlossaryContent(); // 需要实现获取粘贴内容的方法
-      this.customGlossary = customGlossaryContent;
-      console.log("Glossary imported:", this.customGlossary);
+      const inputElement = document.getElementById("glossaryInput");
+      if (inputElement) {
+        this.customGlossary = inputElement.value;
+        console.log("Glossary imported:", this.customGlossary);
+      } else {
+        console.log("未找到术语库输入框");
+      }
+      message.info('已导入术语库');
     },
     getUserID() {
-      // 这里需要根据实际情况获取当前用户的ID，例如从本地存储、Vuex状态管理等获取
-      // 假设从本地存储获取用户ID
-      return localStorage.getItem("user_id");
+      try {
+        return localStorage.getItem("user_id");
+      } catch (error) {
+        this.getUserIDError = error.message;
+        console.error("获取用户ID时发生错误", error);
+        return null;
+      }
     },
     getPastedGlossaryContent() {
       // 这里需要实现获取用户粘贴术语库内容的逻辑，例如监听粘贴事件等
@@ -227,7 +275,7 @@ export default {
 }
 
 label {
-  display: block;
+  display: flex;
   margin-bottom: 5px;
   margin-left: 5px;
 }

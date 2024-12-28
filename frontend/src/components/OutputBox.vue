@@ -8,6 +8,7 @@
 
       <div class="translation-box">
         <h3>翻译结果</h3>
+        <!-- 绑定 translation 到 textarea 的 value -->
         <textarea :value="translation" readonly></textarea>
       </div>
     </div>
@@ -20,19 +21,15 @@ export default {
   props: {
     translation: {
       type: String,
-      default: '',
+      default: '', // 默认翻译结果为空
     },
-    synonyms: {
-      type: Array,
-      default: () => [],
-    },
-    examples: {
-      type: Array,
-      default: () => [],
-    },
+    
   },
 };
 </script>
+
+
+
 
 
 <style scoped>
@@ -61,7 +58,10 @@ export default {
 .output-item {
   flex: 1;
   min-width: 180px;
-  
+  border-bottom: px solid #ae6ac9; /* 增加底部边框的宽度和颜色 */
+}
+.output-item textarea {
+  height: 279px;
 }
 
 .output-label {

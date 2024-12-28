@@ -11,7 +11,7 @@
           </div>
           <div class="ai-dialogue-section">
             <!-- AI头像 -->
-            <img src="@/assets/1.png" alt="AI头像" class="ai-avatar" />
+            <img src="@/assets/ai-avatar.png" alt="AI头像" class="ai-avatar" />
             <!-- AI对话框 -->
             <div class="ai-dialogue-box">
               <div class="ai-dialogue">
@@ -65,7 +65,7 @@
                   @keyup.enter="sendQuestion"
                 ></textarea>
                 <button @click="sendQuestion" :disabled="isLoading">
-                  {{ isLoading ? '发送中...' : '发送' }}
+                  {{ isLoading ? "发送中..." : "发送" }}
                 </button>
               </div>
             </div>
@@ -77,7 +77,7 @@
           </div>
           <div class="auto-polish-section">
             <!-- AI头像 -->
-            <img src="@/assets/1.png" alt="AI头像" class="ai-avatar" />$
+            <img src="@/assets/ai-avatar.png" alt="AI头像" class="ai-avatar" />
             <!-- AI翻译并润色后的回答框 -->
             <div class="ai-answer-box">
               <div class="ai-answer">
@@ -126,7 +126,7 @@
                   :disabled="isPolishing"
                   style="border-color: #a58de7"
                 >
-                  {{ isPolishing ? '处理中...' : '发送文本' }}
+                  {{ isPolishing ? "处理中..." : "发送文本" }}
                 </button>
               </div>
             </div>
@@ -175,11 +175,12 @@ export default {
       autoPolishAnswer: "",
       // 用于存储文本语种检测结果
       detectedLanguage: "",
-      // 当前用户ID，假设已经获取并存储在这里
+      // 当前用户ID,假设已经获取并存储在这里
       currentUserId: 123,
       sourceDetectedLanguage: "",
       userInput: "",
       userInputForAutoPolish: "",
+      currentInput:"",
       userChatMessages: [],
       aiChatMessages: [],
       chatMessagesList: [],
@@ -193,7 +194,7 @@ export default {
     async sendQuestion() {
       if (this.isLoading) return;
       this.isLoading = true;
-      
+      let currentInput;
       try {
         if (this.userInput.trim() !== "") {
           // 添加用户消息到显示
@@ -204,7 +205,7 @@ export default {
           this.userChatMessages.push(userMessage);
 
           // 保存当前输入
-          const currentInput = this.userInput;
+          currentInput = this.userInput;
           // 清空输入框
           this.userInput = "";
 
@@ -228,28 +229,29 @@ export default {
         }
       } catch (error) {
         console.error("发送问题时发生错误:", error);
-        
+
         // 显示错误消息
         const errorMessage = {
           type: "error",
           content: "发送问题失败，请稍后重试",
         };
         this.aiChatMessages.push(errorMessage);
-        
+
         // 恢复输入内容
         if (!this.userInput) {
           this.userInput = currentInput;
         }
       } finally {
         this.isLoading = false;
+        this.userInput="";
       }
     },
 
     async checkConnection() {
       try {
-        await api.get('/health-check', { 
+        await api.get("/health-check", {
           timeout: 5000,
-          retry: 1 
+          retry: 1,
         });
         return true;
       } catch (error) {
@@ -268,32 +270,33 @@ export default {
         console.log("准备发送润色文本:", this.userInputForAutoPolish); // 调试日志
 
         if (!this.userInputForAutoPolish.trim()) {
-          throw new Error('请输入需要润色的文本');
+          throw new Error("请输入需要润色的文本");
         }
 
         // 添加用户消息到显示
         const userMessage = {
           type: "user",
-          content: this.userInputForAutoPolish
+          content: this.userInputForAutoPolish,
         };
         this.chatMessagesList.push(userMessage);
 
         // 发送语言检测请求
         console.log("发送语言检测请求"); // 调试日志
         const detectResponse = await api.post("/api/detectLanguage", {
-          text: this.userInputForAutoPolish
+          text: this.userInputForAutoPolish,
         });
 
         console.log("语言检测响应:", detectResponse.data); // 调试日志
-        
+
         if (detectResponse.data) {
-          this.sourceDetectedLanguage = detectResponse.data.language === 'zh' ? '中文' : '英文';
+          this.sourceDetectedLanguage =
+            detectResponse.data.language === "zh" ? "中文" : "英文";
 
           // 发送润色请求
           console.log("发送润色请求"); // 调试日志
           const polishResponse = await api.post("/api/translate/polish", {
             text: this.userInputForAutoPolish,
-            target: detectResponse.data.language === "en" ? "zh" : "en"
+            target: detectResponse.data.language === "en" ? "zh" : "en",
           });
 
           console.log("润色响应:", polishResponse.data); // 调试日志
@@ -301,7 +304,7 @@ export default {
           if (polishResponse.data && polishResponse.data.translation) {
             const aiMessage = {
               type: "ai",
-              content: polishResponse.data.translation
+              content: polishResponse.data.translation,
             };
             this.chatMessagesList.push(aiMessage);
             this.userInputForAutoPolish = ""; // 清空输入
@@ -314,10 +317,13 @@ export default {
         console.error("错误详情:", {
           message: error.message,
           response: error.response?.data,
-          status: error.response?.status
+          status: error.response?.status,
         });
 
-        this.autoPolishError = error.response?.data?.message || error.message || "润色失败，请稍后重试";
+        this.autoPolishError =
+          error.response?.data?.message ||
+          error.message ||
+          "润色失败，请稍后重试";
         alert(this.autoPolishError);
       } finally {
         this.isPolishing = false;
@@ -333,7 +339,7 @@ export default {
 
       try {
         if (!this.userInputForAutoPolish.trim()) {
-          throw new Error('没有可以重新润色的文本');
+          throw new Error("没有可以重新润色的文本");
         }
 
         // 清空当前消息列表
@@ -342,20 +348,20 @@ export default {
         // 重新添加用户消息
         const userMessage = {
           type: "user",
-          content: this.userInputForAutoPolish
+          content: this.userInputForAutoPolish,
         };
         this.chatMessagesList.push(userMessage);
 
         // 重新发送润色请求
         const response = await api.post("/api/translate/polish", {
           text: this.userInputForAutoPolish,
-          target: this.sourceDetectedLanguage === "中文" ? "en" : "zh"
+          target: this.sourceDetectedLanguage === "中文" ? "en" : "zh",
         });
 
         if (response.data && response.data.translation) {
           const aiMessage = {
             type: "ai",
-            content: response.data.translation
+            content: response.data.translation,
           };
           this.chatMessagesList.push(aiMessage);
         } else {
@@ -388,7 +394,7 @@ export default {
         console.error("新建对话时发生错误:", error);
         alert("新建对话失败：" + error.message);
       }
-    }
+    },
   },
 };
 </script>
@@ -411,25 +417,28 @@ export default {
   border-radius: 5px;
   display: flex;
   flex-direction: column;
+  
 }
 .message-container {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   width: 100%;
+  
 }
 .user-message {
-  background-color: #e3f2fd;
+  background-color: #e4dfed;
   border-radius: 5px;
-  padding: 5px 10px;
+  padding: 2px 2px;
   max-width: 70%;
   word-break: break-word;
   margin-bottom: 10px;
+  
 }
 .ai-message {
   background-color: #d4edda;
   border-radius: 5px;
-  padding: 5px 10px;
+  padding: 2px 2px;
   max-width: 70%;
   word-break: break-word;
   margin-bottom: 10px;
@@ -437,18 +446,21 @@ export default {
 .chat-input {
   display: flex;
   margin-top: 10px;
+  
 }
 .chat-input textarea {
   flex: 1;
-  border: 1px solid #ccc;
+  border: none;
   border-radius: 5px;
   padding: 5px;
+  height:12px;
+  width: 1;
 }
 .chat-input button {
   margin-left: 10px;
   padding: 5px 10px;
   border: none;
-  background-color: #8800ff;
+  background-color: #8352ae;
   color: white;
   border-radius: 5px;
   cursor: pointer;
@@ -521,6 +533,8 @@ export default {
   height: 400px; /* 固定高度 */
   display: flex;
   flex-direction: column;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(108, 66, 225, 0.7);
 }
 .ai-dialogue,
 .user-dialogue {
@@ -531,6 +545,7 @@ export default {
 .ai-messages-container,
 .user-messages-container {
   padding: 10px;
+  
 }
 .ai-message,
 .user-message {
