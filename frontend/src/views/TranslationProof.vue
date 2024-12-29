@@ -141,7 +141,8 @@ export default {
       console.log('朗读译文:', this.userText);
     },
     async checkTranslation() {
-      const url = 'http://8.138.30.178/translate/proofread';
+      //const url = 'http://8.138.30.178/translate/proofread';
+      const url = 'http://localhost:5001/translate/proofread';
       const data = {
         user_id: this.userId,
         originalText: this.sourceText,
@@ -198,7 +199,7 @@ export default {
     },
 
     async saveProofreadResult(data) {
-      const saveUrl = 'http://localhost:8080/translate/upproofread';
+      const saveUrl = 'http://localhost:5001/translate/upproofread';
       //const saveUrl = 'http://8.138.30.178/translate/upproofread';
       try {
         const response = await fetch(saveUrl, {
@@ -231,7 +232,7 @@ export default {
       this.fetchHistoryRecords();
     },
     async fetchHistoryRecords() {
-      const url = 'http://localhost:8080/translate/history';
+      const url = 'http://localhost:5001/translate/history';
       //const url = 'http://8.138.30.178/translate/history';
       try {
         const response = await fetch(`${url}?user_id=${this.userId}`, {
