@@ -140,7 +140,7 @@ export default {
   methods: {
      updateSettings() {
       // 发送POST请求到后端API以更新用户信息
-      axios.post('http://localhost:8080/users/update', this.userProfile)
+      axios.post('http://localhost:5001/users/update', this.userProfile)
         .then(response => {
           if (response.data.base.code === 200) {
             console.log('用户信息更新成功');
@@ -156,7 +156,7 @@ export default {
 
     fetchUserProfile() {
       // 发送GET请求到后端API以获取用户信息
-      axios.get('http://localhost:8080/users/info', {
+      axios.get('http://localhost:5001/users/info', {
         params: {
           user_id: this.userProfile.user_id // 假设你有一个user_id来标识用户
         }
