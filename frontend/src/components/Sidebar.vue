@@ -69,7 +69,7 @@ export default {
     },
     fetchUserInfo() {
       const store = useStore(); // 获取Vuex store实例
-      axios.get('http://localhost:8080/users/info', {
+      axios.get('http://localhost:5001/users/info', {
         params: {
           user_id:store.state.user_id || 1, // 假设用户ID是1，或者从其他地方获取
           fields: 'username' // 假设我们只想获取用户名
