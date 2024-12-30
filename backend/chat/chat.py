@@ -19,14 +19,8 @@ def get_db():
         db.row_factory = sqlite3.Row
     return db
 
-def init_db():
-    with chat_module.app_context():
-        db = get_db()
-        with current_app.open_resource('schema.sql', mode='r') as f:
-            db.cursor().executescript(f.read())
-        db.commit()
-
 def query_db(query, args=(), one=False):
+    """查询数据库"""
     cur = get_db().execute(query, args)
     rv = cur.fetchall()
     cur.close()
@@ -34,12 +28,13 @@ def query_db(query, args=(), one=False):
 
 @chat_module.teardown_app_request
 def close_connection(exception):
+    """关闭数据库连接"""
     db = getattr(g, '_database', None)
     if db is not None:
         db.close()
 
 # 设置 DeepSeek API 密钥
-DEEPSEEK_API_KEY = 'sk-971fe5b4ee2748e4b88d697a7c98b319'
+DEEPSEEK_API_KEY = 'sk-e6b1b54766434fab9058aac4d7bc61d4'
 
 # 初始化 OpenAI 客户端
 client = OpenAI(api_key=DEEPSEEK_API_KEY, base_url="https://api.deepseek.com")
@@ -213,7 +208,7 @@ def detect_language():
         # 这里可以使用第三方服务或库来检测语言
         # 示例使用简单的规则判断
         def simple_detect(text):
-            # 简单示例：检查是否包含中文字符
+            # 简单  例：检查是否包含中文字符
             if any('\u4e00' <= char <= '\u9fff' for char in text):
                 return 'zh'
             return 'en'
@@ -271,4 +266,9 @@ def auto_polish():
             "message": f"服务器错误: {str(e)}"
         }), 500
 
-
+# 只在直接运行此文件时创建应用
+if __name__ == '__main__':
+    app = Flask(__name__)
+    CORS(app)
+    app.register_blueprint(chat_module)
+    app.run(debug=True, host='0.0.0.0', port=5000)
