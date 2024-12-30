@@ -169,7 +169,7 @@ methods: {
   console.log("Fetching weekly data for:", { startDate, endDate });
 
   try {
-    const response = await axios.get('http://8.138.30.178/v1/weekly-data', {
+    const response = await axios.get('http://localhost:5001/v1/weekly-data', {
       params: {
         user_id: this.userId,
         start_date: startDate,
@@ -355,7 +355,7 @@ try {
 
 
     async translateAPI(text, sourceLanguage, targetLanguage) {
-const url = 'http://8.138.30.178/translate/instant';
+const url = 'http://localhost:5001/translate/instant';
 /*const url = 'http://127.0.0.1:5000/translate/instant';*/
 return axios.post(url, {
   user_id: this.userId,
