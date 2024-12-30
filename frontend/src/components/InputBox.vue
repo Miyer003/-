@@ -180,8 +180,8 @@ export default {
 
   // 选择正确的请求 URL
   const url = this.selectedType === 'image' 
-    ? 'http://8.138.30.178/translate/image'  
-    : 'http://8.138.30.178/translate/document'; 
+    ? 'http://localhost:5001/translate/image'  
+    : 'http://localhost:5001/translate/document'; 
 
   fetch(url, {
     method: 'POST',
