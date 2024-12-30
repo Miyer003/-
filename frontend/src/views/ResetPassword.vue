@@ -204,7 +204,7 @@
       };
   
       axios
-        .post('http://127.0.0.1:5001/reset-password', requestData)
+        .post('http://localhost:5001/reset-password', requestData)
         .then((response) => {
           alert('密码重置成功，请重新登录！');
           //alert(`密码是: ${response.data.password}`);
