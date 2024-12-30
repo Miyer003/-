@@ -176,7 +176,7 @@ export default {
     // 获取用户信息的方法
     function fetchUserProfile() {
       const data = { user_id: userProfile.user_id };
-      axios.post('http://localhost:8080/users/info', data)
+      axios.post('http://localhost:5001/users/info', data)
         .then(response => {
           // 处理成功逻辑，更新userProfile
           if (response.data && response.data.user_id) {
@@ -192,7 +192,7 @@ export default {
     // 绑定邮箱的方法
     function bindEmail() {
       // 调用后端API进行邮箱绑定
-      axios.post('http://localhost:8080/api/bind-email', { email: email })
+      axios.post('http://localhost:5001/api/bind-email', { email: email })
         .then(response => {
           // 处理成功逻辑
           console.log('Email绑定成功', response);
@@ -207,7 +207,7 @@ export default {
     // 绑定手机的方法
     function bindPhone() {
       // 调用后端API进行手机绑定
-      axios.post('http://localhost:8080/api/bind-phone', { phoneNumber: phoneNumber })
+      axios.post('http://localhost:5001/api/bind-phone', { phoneNumber: phoneNumber })
         .then(response => {
           // 处理成功逻辑
           console.log('手机绑定成功', response);
