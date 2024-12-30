@@ -180,7 +180,7 @@
     methods: {
       async verifyBirthday() {
         try {
-          const response = await axios.post("http://127.0.0.1:5001/forgot-password/verify", {
+          const response = await axios.post("http://localhost:5001/forgot-password/verify", {
             phone: this.phone,
             birthday: this.birthday,
           });
