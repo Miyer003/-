@@ -60,7 +60,7 @@
           password: this.password,
         };
   
-        axios.post('http://127.0.0.1:5001/login', loginData)
+        axios.post('http://localhost:5001/login', loginData)
           .then((response) => {
             const { message, user_id } = response.data;
   
