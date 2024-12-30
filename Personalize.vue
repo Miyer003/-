@@ -15,12 +15,24 @@
                 >文本风格:</label
               >
               <select v-model="textStyle" id="textStyle" class="form-control">
-                <option value="">正式文体：语言规范、严谨，用词准确、专业，句式较为复杂，多使用长句、复合句，较少使用口语化表达和缩写形式。</option>
-                <option value="">商务文体：简洁明了、专业精准，注重表达的准确性和客观性，常使用专业术语和固定搭配，语气较为正式、礼貌。</option>
-                <option value="">科技文体：逻辑性强，大量使用专业词汇和技术术语，语言表达精确，常包含复杂的概念和数据，句式结构较为严谨。</option>
-                <option value="">文学文体：语言优美、富有感染力，注重形象性和艺术性，常使用各种修辞手法，如比喻、拟人、夸张等，用词丰富多样，句式灵活多变。</option>
-                <option value="">口语化文体：语言通俗易懂、自然流畅，多使用简单句和常用词汇，语气随意、亲切，常包含口语化的表达和习惯用语。</option>
-                <option value="">幽默文体：语言诙谐风趣，善于运用夸张、双关、反语等修辞手法，以达到幽默的效果，使读者在轻松愉快的氛围中接受信息。</option>
+                <option value="">
+                  正式文体：语言规范、严谨，用词准确、专业，句式较为复杂，多使用长句、复合句，较少使用口语化表达和缩写形式。
+                </option>
+                <option value="">
+                  商务文体：简洁明了、专业精准，注重表达的准确性和客观性，常使用专业术语和固定搭配，语气较为正式、礼貌。
+                </option>
+                <option value="">
+                  科技文体：逻辑性强，大量使用专业词汇和技术术语，语言表达精确，常包含复杂的概念和数据，句式结构较为严谨。
+                </option>
+                <option value="">
+                  文学文体：语言优美、富有感染力，注重形象性和艺术性，常使用各种修辞手法，如比喻、拟人、夸张等，用词丰富多样，句式灵活多变。
+                </option>
+                <option value="">
+                  口语化文体：语言通俗易懂、自然流畅，多使用简单句和常用词汇，语气随意、亲切，常包含口语化的表达和习惯用语。
+                </option>
+                <option value="">
+                  幽默文体：语言诙谐风趣，善于运用夸张、双关、反语等修辞手法，以达到幽默的效果，使读者在轻松愉快的氛围中接受信息。
+                </option>
                 <!-- 这里可以添加更多选项 -->
               </select>
             </div>
@@ -140,8 +152,8 @@
 
 <script>
 import Sidebar from "../components/Sidebar.vue";
-import { message } from 'ant-design-vue';
-import axios from 'axios';
+import { message } from "ant-design-vue";
+import axios from "axios";
 
 export default {
   components: {
@@ -173,7 +185,7 @@ export default {
 
       // 调用上传个性化设置接口
       axios
-        .post("/settings/upload", settingsData)
+        .post("http://localhost:5001/settings/upload", settingsData)
         .then((response) => {
           if (response.status === 200) {
             console.log("个性化设置已成功保存");
@@ -185,12 +197,12 @@ export default {
         .catch((error) => {
           console.error("保存个性化设置时发生错误", error);
         });
-        // 无论是否成功，都弹出提示框
-        message.info('已上传个性化');
+      // 无论是否成功，都弹出提示框
+      message.info("已上传个性化");
     },
     resetSettings() {
       // 重置设置的逻辑
-      
+
       this.$data = this.$data.constructor();
     },
     importGlossary() {
@@ -202,7 +214,7 @@ export default {
       } else {
         console.log("未找到术语库输入框");
       }
-      message.info('已导入术语库');
+      message.info("已导入术语库");
     },
     getUserID() {
       try {
