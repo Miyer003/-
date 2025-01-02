@@ -11,7 +11,7 @@ from docx import Document
 from io import BytesIO
 
 from flask_cors import CORS
-import database as db
+
 
 translate_module = Blueprint('transalte_ai', __name__)
 
@@ -19,7 +19,7 @@ translate_module = Blueprint('transalte_ai', __name__)
 CORS(translate_module)
 
 client = OpenAI(
-    api_key="Moonshot api key",#统一替换成同一个api key
+    api_key="sk-MVnFZKbcbo5iDslwkiqoqDN1PTWeumy0TltmYUhQwz6bDq1x",#统一替换成同一个api key
     base_url="https://api.moonshot.cn/v1",
 )
 
@@ -76,11 +76,6 @@ def translate_instant():
     translation_result = call_kimi_api(source_text, target_language)
 
     if translation_result != "无法连接大语言模型":
-        #在数据库中存储
-        query = 'INSERT INTO translations (user_id, source_text, translation, target_language,date) VALUES (?, ?, ?, ?,CURRENT_DATE)'
-        args = (user_id, source_text, translation_result, target_language)
-        db.query_db(query,args)
-
         # 返回翻译结果给前端
         return jsonify({
             'base': {
@@ -144,11 +139,6 @@ def translate_ocr():
     translation_result = call_kimi_api(source_text,target_language)
 
     if translation_result != "无法连接大语言模型":
-        # 在数据库中存储
-        query = 'INSERT INTO translations (user_id, source_text, translation, target_language,date) VALUES (?, ?, ?, ?, CURRENT_DATE)'
-        args = (user_id, source_text, translation_result, target_language)
-        db.query_db(query, args)
-
         # 返回翻译结果给前端
         return jsonify({
             'base': {
@@ -216,11 +206,6 @@ def translate_doc():
     translation_result = call_kimi_api(content, target_language)
 
     if translation_result != "无法连接大语言模型":
-        # 在数据库中存储
-        query = 'INSERT INTO translations (user_id, source_text, translation, target_language, date) VALUES (?, ?, ?, ?, CURRENT_DATE)'
-        args = (user_id, content, translation_result, target_language)
-        db.query_db(query, args)
-
         # 返回翻译结果给前端
         return jsonify({
             'base': {
