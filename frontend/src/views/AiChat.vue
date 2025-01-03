@@ -175,12 +175,12 @@ export default {
       autoPolishAnswer: "",
       // 用于存储文本语种检测结果
       detectedLanguage: "",
-      // 当前用户ID,假设已经获取并存储在这里
+      // 当前用户ID，假设已经获取并存储在这里
       currentUserId: 123,
       sourceDetectedLanguage: "",
       userInput: "",
       userInputForAutoPolish: "",
-      currentInput:"",
+      currentInput: "",
       userChatMessages: [],
       aiChatMessages: [],
       chatMessagesList: [],
@@ -194,7 +194,9 @@ export default {
     async sendQuestion() {
       if (this.isLoading) return;
       this.isLoading = true;
-      let currentInput;
+
+      let currentInput; 
+
       try {
         if (this.userInput.trim() !== "") {
           // 添加用户消息到显示
@@ -210,7 +212,7 @@ export default {
           this.userInput = "";
 
           // 发送请求到后端
-          const response = await api.post("/ai/dialogue", {
+          const response = await api.post("http://localhost:5001/ai/dialogue", {
             user_id: this.currentUserId,
             input_text: currentInput,
           });
@@ -243,13 +245,13 @@ export default {
         }
       } finally {
         this.isLoading = false;
-        this.userInput="";
+        this.userInput = "";
       }
     },
 
     async checkConnection() {
       try {
-        await api.get("/health-check", {
+        await api.get("http://localhost:5001//health-check", {
           timeout: 5000,
           retry: 1,
         });
@@ -259,6 +261,88 @@ export default {
         return false;
       }
     },
+
+    // 信息检索部分AI回答对话框下刷新按钮的方法
+    refreshInfoRetrievalAnswer() {
+      // 提示用户正在刷新回答
+      alert("正在刷新回答，请稍候...");
+      // 清空当前AI回答消息列表
+      this.aiChatMessages = [];
+      const data = {
+        user_id: this.currentUserId,
+        input_text: this.userInput,
+      };
+      this.$http
+        .post("http://localhost:5001/ai/dialogue", data)
+        .then((response) => {
+          if (response.status === 200) {
+            const aiMessage = {
+              type: "ai",
+              content: response.message,
+            };
+            this.aiChatMessages.push(aiMessage);
+          } else {
+            console.log("获取AI回答失败", response.message);
+            // 给用户弹出错误提示弹窗
+            alert("刷新回答失败：" + response.message);
+          }
+        })
+        .catch((error) => {
+          console.error("发送问题时发生错误", error);
+          // 给用户弹出错误提示弹窗
+          alert("刷新回答失败：网络错误，请检查网络连接。");
+        });
+    },
+
+    // 信息检索部分AI回答对话框下复制按钮的方法
+    // copyInformationRetrievalAnswer() {
+    //   const textarea = document.createElement("textarea");
+    //   textarea.value = this.informationRetrievalAnswer;
+    //   document.body.appendChild(textarea);
+    //   textarea.select();
+    //   document.execCommand("copy");
+    //   document.body.removeChild(textarea);
+    //   // 提示用户已复制到剪贴板
+    //   alert("已复制到剪贴板");
+    // },
+
+    // 信息检索部分新建对话的方法
+    newInformationRetrievalDialog() {
+      // 询问用户是否确认新建对话
+      if (confirm("确定要新建对话吗？此操作将清空当前对话内容。")) {
+        // 清空输入框
+        this.userInput = "";
+        // 清空消息列表
+        this.userChatMessages = [];
+        this.aiChatMessages = [];
+        location.reload();
+      }
+    },
+
+    //信息检索下查看历史记录
+    // viewHistory() {
+    //   getChatHistory()
+    //     .then((response) => {
+    //       const messages = response.history.map((message) => ({
+    //         type: message.sender === "user" ? "user" : "ai",
+    //         content: message.content,
+    //       }));
+    //       this.userChatMessages = messages.filter(
+    //         (message) => message.type === "user"
+    //       );
+    //       this.aiChatMessages = messages.filter(
+    //         (message) => message.type === "ai"
+    //       );
+    //     })
+    //     .catch((error) => {
+    //       console.error("获取历史记录失败", error);
+    //       const errorMessage = {
+    //         type: "error",
+    //         content: "获取历史记录失败，请稍后重试",
+    //       };
+    //       this.aiChatMessages.push(errorMessage);
+    //     });
+    // },
 
     // 修改自动润色发送方法
     async sendAutoPolishText() {
@@ -282,9 +366,12 @@ export default {
 
         // 发送语言检测请求
         console.log("发送语言检测请求"); // 调试日志
-        const detectResponse = await api.post("/api/detectLanguage", {
-          text: this.userInputForAutoPolish,
-        });
+        const detectResponse = await api.post(
+          "http://localhost:5001/api/detectLanguage",
+          {
+            text: this.userInputForAutoPolish,
+          }
+        );
 
         console.log("语言检测响应:", detectResponse.data); // 调试日志
 
@@ -294,10 +381,13 @@ export default {
 
           // 发送润色请求
           console.log("发送润色请求"); // 调试日志
-          const polishResponse = await api.post("/api/translate/polish", {
-            text: this.userInputForAutoPolish,
-            target: detectResponse.data.language === "en" ? "zh" : "en",
-          });
+          const polishResponse = await api.post(
+            "http://localhost:5001/api/translate/polish",
+            {
+              text: this.userInputForAutoPolish,
+              target: detectResponse.data.language === "en" ? "zh" : "en",
+            }
+          );
 
           console.log("润色响应:", polishResponse.data); // 调试日志
 
@@ -353,10 +443,13 @@ export default {
         this.chatMessagesList.push(userMessage);
 
         // 重新发送润色请求
-        const response = await api.post("/api/translate/polish", {
-          text: this.userInputForAutoPolish,
-          target: this.sourceDetectedLanguage === "中文" ? "en" : "zh",
-        });
+        const response = await api.post(
+          "http://localhost:5001/api/translate/polish",
+          {
+            text: this.userInputForAutoPolish,
+            target: this.sourceDetectedLanguage === "中文" ? "en" : "zh",
+          }
+        );
 
         if (response.data && response.data.translation) {
           const aiMessage = {
@@ -375,6 +468,43 @@ export default {
         this.isPolishing = false;
       }
     },
+
+    // 自动润色部分AI润色回答对话框下复制按钮的方法
+    // copyAutoPolishAnswer() {
+    //   const textarea = document.createElement("textarea");
+    //   textarea.value = this.autoPolishAnswer;
+    //   document.body.appendChild(textarea);
+    //   textarea.select();
+    //   document.execCommand("copy");
+    //   document.body.removeChild(textarea);
+    //   // 提示用户已复制润色结果到剪贴板
+    //   alert("已复制润色结果到剪贴板");
+    // },
+
+    // 自动润色部分查看历史对话的方法（需根据实际情况实现）
+    // viewAutoPolishHistory() {
+    //   getAutoPolishChatHistory() // 假设这里有一个获取自动润色聊天历史的函数，需根据实际情况实现
+    //     .then((response) => {
+    //       const messages = response.translations.map((message) => ({
+    //         type: message.source === "user" ? "user" : "ai",
+    //         content: message.text,
+    //       }));
+    //       this.userChatMessages = messages.filter(
+    //         (message) => message.type === "user"
+    //       );
+    //       this.chatMessagesList = messages.filter(
+    //         (message) => message.type === "ai"
+    //       );
+    //     })
+    //     .catch((error) => {
+    //       console.error("获取自动润色历史记录失败", error);
+    //       const errorMessage = {
+    //         type: "error",
+    //         content: "获取自动润色历史记录失败，请稍后重试",
+    //       };
+    //       this.chatMessagesList.push(errorMessage);
+    //     });
+    // },
 
     // 修改新建润色对话的方法
     newAutoPolishDialog() {
@@ -417,14 +547,12 @@ export default {
   border-radius: 5px;
   display: flex;
   flex-direction: column;
-  
 }
 .message-container {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   width: 100%;
-  
 }
 .user-message {
   background-color: #e4dfed;
@@ -433,7 +561,6 @@ export default {
   max-width: 70%;
   word-break: break-word;
   margin-bottom: 10px;
-  
 }
 .ai-message {
   background-color: #d4edda;
@@ -446,14 +573,13 @@ export default {
 .chat-input {
   display: flex;
   margin-top: 10px;
-  
 }
 .chat-input textarea {
   flex: 1;
   border: none;
   border-radius: 5px;
   padding: 5px;
-  height:12px;
+  height: 12px;
   width: 1;
 }
 .chat-input button {
@@ -530,7 +656,7 @@ export default {
   border: 1px solid #ccc;
   padding: 10px;
   width: 35%;
-  height: 400px; /* 固定高度 */
+  height: 450px; /* 固定高度 */
   display: flex;
   flex-direction: column;
   border-radius: 5px;
@@ -545,7 +671,6 @@ export default {
 .ai-messages-container,
 .user-messages-container {
   padding: 10px;
-  
 }
 .ai-message,
 .user-message {
