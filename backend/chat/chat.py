@@ -208,7 +208,7 @@ def detect_language():
         # 这里可以使用第三方服务或库来检测语言
         # 示例使用简单的规则判断
         def simple_detect(text):
-            # 简单  例：检查是否包含中文字符
+            # 简单��例：检查是否包含中文字符
             if any('\u4e00' <= char <= '\u9fff' for char in text):
                 return 'zh'
             return 'en'
