@@ -2,7 +2,7 @@ import axios from "axios";
 
 // 创建 axios 实例
 export const api = axios.create({
-  baseURL: "http://8.138.30.178/",
+  baseURL: "http://localhost:5001",
   timeout: 30000,
   headers: {
     "Content-Type": "application/json",
